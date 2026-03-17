@@ -125,7 +125,7 @@ td:first-child{font-weight:500;color:var(--pri)}
 <div class="calc-title">Custom Quantity</div>
 <div class="calc-row">
 <div class="field"><label>Flyer Size</label><select id="calcSize" onchange="calcQuote()"><option value="A5">A5 Size</option><option value="A4">A4 Size</option><option value="A3">A3 Size</option></select></div>
-<div class="field"><label>Paper GSM</label><select id="calcGsm" onchange="calcQuote()"><option value="128">128gsm or below</option><option value="157">157gsm or below</option><option value="260">210gsm or below</option></select></div>
+<div class="field"><label>Paper GSM</label><select id="calcGsm" onchange="calcQuote()"><option value="128">128gsm or below</option><option value="157">157gsm or below</option><option value="260">260gsm or below</option></select></div>
 <div class="field"><label id="qtyLabel">Enter Quantity</label><input type="number" id="calcQty" min="0" step="1" placeholder="e.g. 15000" oninput="calcQuote()"/></div>
 </div>
 <div class="result-box"><div class="lbl">Estimated Distribution Cost:</div><div class="val" id="estCost">$0.00</div></div>
@@ -264,7 +264,7 @@ function buildTable(data,gsms,headers,containerId,tableType){
 function fmtQty(n){return n>=1000?n.toLocaleString():n}
 function fmtNum(n){return n.toLocaleString()}
 
-var GSMS=[{key:"128",label:"128gsm or below"},{key:"157",label:"157gsm or below"},{key:"260",label:"210gsm or below"}];
+var GSMS=[{key:"128",label:"128gsm or below"},{key:"157",label:"157gsm or below"},{key:"260",label:"260gsm or below"}];
 
 // ========= INIT TABLES =========
 
