@@ -87,13 +87,9 @@ td:first-child{font-weight:500;color:var(--pri)}
 <div class="pills" id="hdbPills">
 <div class="pill active" onclick="switchHdbSub('standard')">Standard</div>
 <div class="pill" onclick="switchHdbSub('estate')">Selected Estate</div>
-<div class="pill" onclick="switchHdbSub('tong')">Selected Blocks 通</div>
-<div class="pill" onclick="switchHdbSub('butong')">Selected Blocks 不通</div>
 </div>
 <div id="hdb-sub-standard" class="sub-section active"></div>
 <div id="hdb-sub-estate" class="sub-section"></div>
-<div id="hdb-sub-tong" class="sub-section"></div>
-<div id="hdb-sub-butong" class="sub-section"></div>
 </div>
 
 <!-- ===== HDB LETTERBOX ===== -->
@@ -166,16 +162,16 @@ var HDB_STD={
 };
 var HDB_STD_RATE={"128":{A5:38,A4:44,A3:64},"157":{A5:40,A4:49,A3:69},"260":{A5:44,A4:64,A3:104}};
 
-// HDB Type 2 Selected Estate [qty, A5tong, A5butong, A5, A4, A3]
+// HDB Type 2 Selected Estate [qty, A5, A4, A3]
 var HDB_ESTATE={
-"128":[[1000,179,219,147,182,227],[2000,278,359,218,294,375],[3000,387,507,297,411,531],[4000,436,596,316,468,628]],
-"157":[[1000,181,221,149,187,232],[2000,282,363,222,304,385],[3000,393,513,303,426,546],[4000,444,604,324,488,648]],
-"260":[[1000,185,225,153,202,247],[2000,290,371,230,334,415],[3000,405,525,315,471,591],[4000,460,620,340,548,708]]
+"128":[[1000,151,157,177],[2000,218,230,270],[3000,297,315,375],[4000,316,340,420]],
+"157":[[1000,153,160,185],[2000,222,240,280],[3000,303,330,390],[4000,324,360,440]],
+"260":[[1000,157,177,215],[2000,230,270,350],[3000,315,375,495],[4000,340,420,540]]
 };
 var HDB_ESTATE_RATE={
-"128":{A5:109,A5b:149,A5e:79,A4:117,A4b:157,A4e:85,A3:137,A3b:177,A3e:105},
-"157":{A5:111,A5b:151,A5e:81,A4:122,A4b:162,A4e:90,A3:142,A3b:182,A3e:110},
-"260":{A5:115,A5b:155,A5e:85,A4:137,A4b:177,A4e:105,A3:167,A3b:207,A3e:135}
+"128":{A5:79,A4:85,A3:105},
+"157":{A5:81,A4:90,A3:110},
+"260":{A5:85,A4:105,A3:135}
 };
 
 // Solely Flyer rates per 1000
@@ -271,20 +267,8 @@ var GSMS=[{key:"128",label:"128gsm or below"},{key:"157",label:"157gsm or below"
 function initTables(){
     // HDB Standard
     buildTable(HDB_STD,GSMS,['QTY','A5','A4','A3'],'hdb-sub-standard','qty');
-    // HDB Estate - show all columns
-    buildTable(HDB_ESTATE,GSMS,['QTY','A5 (通)','A5 (不通)','A5','A4','A3'],'hdb-sub-estate','qty');
-    // HDB Selected Blocks 通 - extract just tong column
-    var tongData={};
-    Object.keys(HDB_ESTATE).forEach(function(g){
-        tongData[g]=HDB_ESTATE[g].map(function(r){return[r[0],r[1]];});
-    });
-    buildTable(tongData,GSMS,['QTY','A5 (通)'],'hdb-sub-tong','qty');
-    // HDB Selected Blocks 不通
-    var btData={};
-    Object.keys(HDB_ESTATE).forEach(function(g){
-        btData[g]=HDB_ESTATE[g].map(function(r){return[r[0],r[2]];});
-    });
-    buildTable(btData,GSMS,['QTY','A5 (不通)'],'hdb-sub-butong','qty');
+    // HDB Estate
+    buildTable(HDB_ESTATE,GSMS,['QTY','A5','A4','A3'],'hdb-sub-estate','qty');
 
     // HDB Letterbox (Solely Flyer rates)
     var lbData={};
@@ -381,23 +365,7 @@ function calcQuote(){
             if(t&&r){
                 var p=prorate(t,qty,sizeIdx);
                 if(p!==null){distCost=p;}
-                else{var base=t[t.length-1][sizeIdx];var rk=size==='A5'?'A5e':size==='A4'?'A4e':'A3e';distCost=base+((qty-4000)/1000)*(r[rk]||0);}
-            }
-        } else if(subId==='tong'){
-            var t=HDB_ESTATE[gsm];var r=HDB_ESTATE_RATE[gsm];
-            if(t&&r){
-                var tongTiers=t.map(function(row){return[row[0],row[1]];});
-                var p=prorate(tongTiers,qty,1);
-                if(p!==null){distCost=p;}
-                else{var base=tongTiers[tongTiers.length-1][1];distCost=base+((qty-4000)/1000)*(r['A5']||0);}
-            }
-        } else if(subId==='butong'){
-            var t=HDB_ESTATE[gsm];var r=HDB_ESTATE_RATE[gsm];
-            if(t&&r){
-                var btTiers=t.map(function(row){return[row[0],row[2]];});
-                var p=prorate(btTiers,qty,1);
-                if(p!==null){distCost=p;}
-                else{var base=btTiers[btTiers.length-1][1];distCost=base+((qty-4000)/1000)*(r['A5b']||0);}
+                else{var base=t[t.length-1][sizeIdx];var rate=r[size]||0;distCost=base+((qty-4000)/1000)*rate;}
             }
         }
     } else if(svc==='letterbox'){
