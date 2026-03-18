@@ -87,9 +87,13 @@ td:first-child{font-weight:500;color:var(--pri)}
 <div class="pills" id="hdbPills">
 <div class="pill active" onclick="switchHdbSub('standard')">Standard</div>
 <div class="pill" onclick="switchHdbSub('estate')">Selected Estate</div>
+<div class="pill" onclick="switchHdbSub('tong')">Selected Blocks 通</div>
+<div class="pill" onclick="switchHdbSub('butong')">Selected Blocks 不通</div>
 </div>
 <div id="hdb-sub-standard" class="sub-section active"></div>
 <div id="hdb-sub-estate" class="sub-section"></div>
+<div id="hdb-sub-tong" class="sub-section"></div>
+<div id="hdb-sub-butong" class="sub-section"></div>
 </div>
 
 <!-- ===== HDB LETTERBOX ===== -->
@@ -172,6 +176,30 @@ var HDB_ESTATE_RATE={
 "128":{A5:79,A4:85,A3:105},
 "157":{A5:81,A4:90,A3:110},
 "260":{A5:85,A4:105,A3:135}
+};
+
+// HDB Selected Block 通 [qty, A5, A4, A3]
+var HDB_TONG={
+"128":[[1000,179,182,202],[2000,278,294,334],[3000,387,411,471],[4000,436,468,548]],
+"157":[[1000,181,187,207],[2000,282,304,344],[3000,393,426,486],[4000,444,488,568]],
+"260":[[1000,185,202,242],[2000,290,334,414],[3000,405,471,591],[4000,460,548,668]]
+};
+var HDB_TONG_RATE={
+"128":{A5:109,A4:117,A3:137},
+"157":{A5:111,A4:122,A3:142},
+"260":{A5:115,A4:137,A3:167}
+};
+
+// HDB Selected Blocks 不通 [qty, A5, A4, A3]
+var HDB_BUTONG={
+"128":[[1000,219,227,247],[2000,359,375,415],[3000,507,531,591],[4000,596,628,708]],
+"157":[[1000,221,232,252],[2000,363,385,425],[3000,513,546,606],[4000,604,648,728]],
+"260":[[1000,225,247,287],[2000,371,415,495],[3000,525,591,711],[4000,620,708,828]]
+};
+var HDB_BUTONG_RATE={
+"128":{A5:149,A4:157,A3:177},
+"157":{A5:151,A4:162,A3:182},
+"260":{A5:155,A4:177,A3:207}
 };
 
 // Solely Flyer rates per 1000
@@ -269,6 +297,10 @@ function initTables(){
     buildTable(HDB_STD,GSMS,['QTY','A5','A4','A3'],'hdb-sub-standard','qty');
     // HDB Estate
     buildTable(HDB_ESTATE,GSMS,['QTY','A5','A4','A3'],'hdb-sub-estate','qty');
+    // HDB Selected Block 通
+    buildTable(HDB_TONG,GSMS,['QTY','A5','A4','A3'],'hdb-sub-tong','qty');
+    // HDB Selected Blocks 不通
+    buildTable(HDB_BUTONG,GSMS,['QTY','A5','A4','A3'],'hdb-sub-butong','qty');
 
     // HDB Letterbox (Solely Flyer rates)
     var lbData={};
@@ -362,6 +394,20 @@ function calcQuote(){
             }
         } else if(subId==='estate'){
             var t=HDB_ESTATE[gsm];var r=HDB_ESTATE_RATE[gsm];
+            if(t&&r){
+                var p=prorate(t,qty,sizeIdx);
+                if(p!==null){distCost=p;}
+                else{var base=t[t.length-1][sizeIdx];var rate=r[size]||0;distCost=base+((qty-4000)/1000)*rate;}
+            }
+        } else if(subId==='tong'){
+            var t=HDB_TONG[gsm];var r=HDB_TONG_RATE[gsm];
+            if(t&&r){
+                var p=prorate(t,qty,sizeIdx);
+                if(p!==null){distCost=p;}
+                else{var base=t[t.length-1][sizeIdx];var rate=r[size]||0;distCost=base+((qty-4000)/1000)*rate;}
+            }
+        } else if(subId==='butong'){
+            var t=HDB_BUTONG[gsm];var r=HDB_BUTONG_RATE[gsm];
             if(t&&r){
                 var p=prorate(t,qty,sizeIdx);
                 if(p!==null){distCost=p;}
