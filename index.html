@@ -370,9 +370,9 @@ function prorate(tiers,qty,sizeIdx){
                 // Cap at tier 1 price
                 return Math.min(calc, tiers[0][sizeIdx]);
             }
-            var lo=tiers[i-1],hi=tiers[i];
-            var frac=(qty-lo[0])/(hi[0]-lo[0]);
-            var calc=lo[sizeIdx]+frac*(hi[sizeIdx]-lo[sizeIdx]);
+            // Use the 1K tier unit rate for all proration
+            var unitRate = tiers[0][sizeIdx] / tiers[0][0];
+            var calc = unitRate * qty;
             // Cap at next tier price
             return Math.min(calc, hi[sizeIdx]);
         }
