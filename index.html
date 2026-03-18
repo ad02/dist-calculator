@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Distribution Only Quotation</title>
+<style>
+:root{--pri:#1a1a1a;--acc:#2563eb;--bg:#f8fafc;--bdr:#e2e8f0;--txt:#334155;--mut:#64748b;--ok:#16a34a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--txt);padding:0;background:#fff;line-height:1.5}
+.header{background:var(--pri);color:#fff;padding:18px 24px;font-size:20px;font-weight:700;border-radius:12px 12px 0 0}
+.wrap{max-width:960px;margin:24px auto;border:1px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.body{padding:24px}
+label.cap{font-size:12px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+select,input[type=number]{padding:9px 14px;font-size:14px;border:1px solid var(--bdr);border-radius:6px;outline:none;background:#fff;color:var(--pri);transition:border .2s}
+select{appearance:none;-webkit-appearance:none;padding-right:34px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23334155'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select:focus,input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.full-select{width:100%;margin-bottom:20px}
+/* Sub-type pills */
+.pills{display:flex;gap:0;margin-bottom:16px;flex-wrap:wrap}
+.pill{padding:10px 20px;font-size:13px;font-weight:600;border:2px solid var(--bdr);background:#fff;cursor:pointer;color:var(--txt);transition:all .15s}
+.pill:first-child{border-radius:8px 0 0 8px}
+.pill:last-child{border-radius:0 8px 8px 0}
+.pill.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+/* GSM tabs */
+.gsm-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.gsm-tab{padding:7px 16px;font-size:13px;font-weight:500;border:1px solid var(--bdr);border-radius:20px;background:var(--bg);cursor:pointer;color:var(--mut);transition:all .15s}
+.gsm-tab.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+/* Tables */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--bdr);border-radius:8px;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:11px 16px;border-bottom:1px solid var(--bdr);text-align:left;white-space:nowrap}
+th{background:var(--bg);font-weight:600;color:var(--pri);text-transform:uppercase;font-size:11px;letter-spacing:.5px}
+tr:nth-child(even){background:#fafafa}
+tr:hover{background:#f1f5f9}
+tr:last-child td{border-bottom:none}
+td:first-child{font-weight:500;color:var(--pri)}
+/* Custom qty */
+.calc-section{border:1px solid var(--bdr);border-radius:10px;padding:20px;margin-bottom:20px;background:#fff}
+.calc-title{font-size:15px;font-weight:700;color:var(--acc);margin-bottom:14px}
+.calc-row{display:flex;gap:16px;align-items:end;flex-wrap:wrap;margin-bottom:16px}
+.calc-row .field{display:flex;flex-direction:column;gap:4px}
+.calc-row .field label{font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.4px}
+.calc-row input[type=number]{width:140px}
+.result-box{text-align:center;padding:14px;border:2px solid var(--acc);border-radius:8px;background:#eff6ff;margin-bottom:20px}
+.result-box .lbl{font-size:13px;color:var(--txt)}
+.result-box .val{font-size:24px;font-weight:700;color:var(--acc);margin-top:2px}
+/* Add-ons */
+.addon-section{border:1px solid var(--bdr);border-radius:10px;padding:20px;margin-bottom:20px;background:#fff}
+.addon-title{font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.addon-row{display:flex;gap:16px;flex-wrap:wrap}
+.addon-row .field{flex:1;min-width:120px;display:flex;flex-direction:column;gap:4px}
+.addon-row .field label{font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.3px}
+.addon-row .field input{width:100%}
+/* Pickup */
+.pickup-box{border:1px solid var(--bdr);border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.pickup-box input[type=checkbox]{width:18px;height:18px;cursor:pointer}
+.pickup-box label{font-size:14px;font-weight:500;cursor:pointer}
+.pickup-box .fee{font-size:13px;color:var(--mut)}
+/* Grand total */
+.grand-total{background:#fffbeb;border:2px solid #fbbf24;border-radius:10px;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.grand-total .lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--pri)}
+.grand-total .val{font-size:28px;font-weight:800;color:var(--ok)}
+/* Sections */
+.svc-section{display:none}.svc-section.active{display:block}
+.sub-section{display:none}.sub-section.active{display:block}
+.gsm-panel{display:none}.gsm-panel.active{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="header">Distribution Only Quotation</div>
+<div class="body">
+
+<label class="cap">Type of Distribution Services</label>
+<select class="full-select" id="mainService" onchange="switchService()">
+<option value="hdb">HDB door to door/car drop</option>
+<option value="letterbox">HDB Letterbox</option>
+<option value="landed">Landed Property</option>
+<option value="industrial">Industrial Letterbox</option>
+<option value="walkway">Walkway</option>
+</select>
+
+<!-- ===== HDB DOOR TO DOOR ===== -->
+<div id="svc-hdb" class="svc-section active">
+<label class="cap">HDB Service Type</label>
+<div class="pills" id="hdbPills">
+<div class="pill active" onclick="switchHdbSub('standard')">Standard</div>
+<div class="pill" onclick="switchHdbSub('estate')">Selected Estate</div>
+<div class="pill" onclick="switchHdbSub('tong')">Selected Blocks 通</div>
+<div class="pill" onclick="switchHdbSub('butong')">Selected Blocks 不通</div>
+</div>
+<div id="hdb-sub-standard" class="sub-section active"></div>
+<div id="hdb-sub-estate" class="sub-section"></div>
+<div id="hdb-sub-tong" class="sub-section"></div>
+<div id="hdb-sub-butong" class="sub-section"></div>
+</div>
+
+<!-- ===== HDB LETTERBOX ===== -->
+<div id="svc-letterbox" class="svc-section"></div>
+
+<!-- ===== LANDED ===== -->
+<div id="svc-landed" class="svc-section"></div>
+
+<!-- ===== INDUSTRIAL ===== -->
+<div id="svc-industrial" class="svc-section"></div>
+
+<!-- ===== WALKWAY ===== -->
+<div id="svc-walkway" class="svc-section">
+<label class="cap">Walkway Service Type</label>
+<div class="pills" id="walkPills">
+<div class="pill active" onclick="switchWalkSub('standard')">Standard</div>
+<div class="pill" onclick="switchWalkSub('express')">Express/Selected Date</div>
+<div class="pill" onclick="switchWalkSub('remote')">Remote Area</div>
+<div class="pill" onclick="switchWalkSub('remoteexp')">Remote Area Express</div>
+</div>
+<div id="walk-sub-standard" class="sub-section active"></div>
+<div id="walk-sub-express" class="sub-section"></div>
+<div id="walk-sub-remote" class="sub-section"></div>
+<div id="walk-sub-remoteexp" class="sub-section"></div>
+</div>
+
+<!-- CALC + ADDONS + TOTAL (shared) -->
+<div class="calc-section" id="calcSection">
+<div class="calc-title">Custom Quantity</div>
+<div class="calc-row">
+<div class="field"><label>Flyer Size</label><select id="calcSize" onchange="calcQuote()"><option value="A5">A5 Size</option><option value="A4">A4 Size</option><option value="A3">A3 Size</option></select></div>
+<div class="field"><label>Paper GSM</label><select id="calcGsm" onchange="calcQuote()"><option value="128">128gsm or below</option><option value="157">157gsm or below</option><option value="260">260gsm or below</option></select></div>
+<div class="field"><label id="qtyLabel">Enter Quantity</label><input type="number" id="calcQty" min="0" step="1" placeholder="e.g. 15000" oninput="calcQuote()"/></div>
+</div>
+<div class="result-box"><div class="lbl">Estimated Distribution Cost:</div><div class="val" id="estCost">$0.00</div></div>
+</div>
+
+<div class="addon-section">
+<div class="addon-title">Add-On Surcharges</div>
+<div class="addon-row">
+<div class="field"><label>Express Services</label><input type="number" id="addonExpress" min="0" value="0" oninput="calcQuote()"/></div>
+<div class="field"><label>Add. Landmark</label><input type="number" id="addonLandmark" min="0" value="0" oninput="calcQuote()"/></div>
+<div class="field"><label>Solo Flyer (QTY)</label><input type="number" id="addonSolo" min="0" value="0" oninput="calcQuote()"/></div>
+<div class="field"><label>Multiple (QTY)</label><input type="number" id="addonMultiple" min="0" value="0" oninput="calcQuote()"/></div>
+</div>
+</div>
+
+<div class="pickup-box">
+<input type="checkbox" id="pickupCheck" onchange="calcQuote()"/>
+<label for="pickupCheck">Require Pick Up Services?</label>
+<span class="fee">(Flat fee of $20.00)</span>
+</div>
+
+<div class="grand-total">
+<div class="lbl">Estimated Grand Total</div>
+<div class="val" id="grandTotal">$0.00</div>
+</div>
+
+</div>
+</div>
+
+<script>
+// ========= PRICING DATA =========
+
+// HDB Type 1 Selected Block [qty, A5, A4, A3, A3prem]
+var HDB_STD={
+"128":[[1000,149,155,175],[2000,177,189,229],[3000,194,212,272],[4000,212,236,316],[5000,240,270,370],[6000,288,324,444],[7000,301,343,483],[8000,344,392,552],[9000,360,418,594],[10000,380,440,640]],
+"157":[[1000,151,160,185],[2000,181,199,233],[3000,200,227,292],[4000,230,266,341],[5000,250,295,400],[6000,300,354,479],[7000,315,378,523],[8000,348,432,597],[9000,372,459,644],[10000,400,490,690]],
+"260":[[1000,155,175,215],[2000,189,259,309],[3000,212,272,392],[4000,236,316,476],[5000,270,370,570],[6000,324,396,684],[7000,343,483,763],[8000,392,552,872],[9000,418,594,954],[10000,440,640,1040]]
+};
+var HDB_STD_RATE={"128":{A5:38,A4:44,A3:64},"157":{A5:40,A4:49,A3:69},"260":{A5:44,A4:64,A3:104}};
+
+// HDB Type 2 Selected Estate [qty, A5, A4, A3]
+var HDB_ESTATE={
+"128":[[1000,151,157,177],[2000,218,230,270],[3000,297,315,375],[4000,316,340,420]],
+"157":[[1000,153,160,185],[2000,222,240,280],[3000,303,330,390],[4000,324,360,440]],
+"260":[[1000,157,177,215],[2000,230,270,350],[3000,315,375,495],[4000,340,420,540]]
+};
+var HDB_ESTATE_RATE={
+"128":{A5:79,A4:85,A3:105},
+"157":{A5:81,A4:90,A3:110},
+"260":{A5:85,A4:105,A3:135}
+};
+
+// HDB Selected Block 通 [qty, A5, A4, A3]
+var HDB_TONG={
+"128":[[1000,179,182,202],[2000,278,294,334],[3000,387,411,471],[4000,436,468,548]],
+"157":[[1000,181,187,207],[2000,282,304,344],[3000,393,426,486],[4000,444,488,568]],
+"260":[[1000,185,202,242],[2000,290,334,414],[3000,405,471,591],[4000,460,548,668]]
+};
+var HDB_TONG_RATE={
+"128":{A5:109,A4:117,A3:137},
+"157":{A5:111,A4:122,A3:142},
+"260":{A5:115,A4:137,A3:167}
+};
+
+// HDB Selected Blocks 不通 [qty, A5, A4, A3]
+var HDB_BUTONG={
+"128":[[1000,219,227,247],[2000,359,375,415],[3000,507,531,591],[4000,596,628,708]],
+"157":[[1000,221,232,252],[2000,363,385,425],[3000,513,546,606],[4000,604,648,728]],
+"260":[[1000,225,247,287],[2000,371,415,495],[3000,525,591,711],[4000,620,708,828]]
+};
+var HDB_BUTONG_RATE={
+"128":{A5:149,A4:157,A3:177},
+"157":{A5:151,A4:162,A3:182},
+"260":{A5:155,A4:177,A3:207}
+};
+
+// Solely Flyer rates per 1000
+var SOLELY={"128":{A5:15,A4:30},"157":{A5:17,A4:32},"260":{A5:21,A4:36}};
+
+// Landed/Industrial [qty, A5, A4, A3]
+var LANDED={
+"128":[[1000,189,194,229],[2000,213,223,293],[3000,258,284,393],[4000,284,304,444]],
+"157":[[1000,192,219,234],[2000,219,253,298],[3000,282,323,398],[4000,296,364,464]],
+"260":[[1000,194,229,309],[2000,223,293,453],[3000,284,393,633],[4000,304,444,764]]
+};
+var LANDED_RATE={"128":{A5:71,A4:76,A3:111},"157":{A5:74,A4:91,A3:116},"260":{A5:76,A4:111,A3:191}};
+
+// Walkway Standard [slot, A5, A4, A3]
+var WALK_STD={
+"128":[[1,142,147,182],[2,178,188,258],[3,252,278,387],[4,276,296,436]],
+"157":[[1,145,172,187],[2,184,218,263],[3,276,317,392],[4,288,356,456]],
+"260":[[1,147,182,262],[2,188,258,418],[3,278,387,627],[4,296,436,756]]
+};
+var WALK_STD_RATE={"128":{A5:69,A4:74,A3:109},"157":{A5:72,A4:89,A3:114},"260":{A5:74,A4:109,A3:189}};
+
+// Walkway Remote
+var WALK_REMOTE={
+"128":[[1,172,177,212],[2,238,248,318],[3,342,357,477],[4,396,416,556]],
+"157":[[1,172,177,212],[2,238,248,318],[3,342,357,477],[4,396,416,556]],
+"260":[[1,172,177,212],[2,238,248,318],[3,342,357,477],[4,396,416,556]]
+};
+var WALK_REMOTE_RATE={"128":{A5:99,A4:104,A3:139},"157":{A5:99,A4:104,A3:139},"260":{A5:99,A4:104,A3:139}};
+
+// Walkway Express
+var WALK_EXP={
+"128":[[1,207,212,247],[2,309,318,388],[3,447,473,582],[4,536,556,696]],
+"157":[[1,207,212,247],[2,309,318,388],[3,447,473,582],[4,536,556,696]],
+"260":[[1,207,212,247],[2,309,318,388],[3,447,473,582],[4,536,556,696]]
+};
+var WALK_EXP_RATE={"128":{A5:134,A4:139,A3:174},"157":{A5:134,A4:139,A3:174},"260":{A5:134,A4:139,A3:174}};
+
+// Walkway Express Remote
+var WALK_EXPR={
+"128":[[1,237,242,277],[2,369,379,449],[3,537,552,672],[4,656,676,816]],
+"157":[[1,237,242,277],[2,369,379,449],[3,537,552,672],[4,656,676,816]],
+"260":[[1,237,242,277],[2,369,379,449],[3,537,552,672],[4,656,676,816]]
+};
+var WALK_EXPR_RATE={"128":{A5:164,A4:169,A3:204},"157":{A5:164,A4:169,A3:204},"260":{A5:164,A4:169,A3:204}};
+
+// Express surcharge rates
+var EXPRESS_RATE={hdb:20,landed:40,industrial:40,letterbox:20};
+var EXPRESS_MIN=150;
+var LANDMARK_RATE=40;
+var PICKUP_FEE=20;
+
+// ========= TABLE BUILDERS =========
+
+function buildTable(data,gsms,headers,containerId,tableType){
+    var c=document.getElementById(containerId);
+    if(!c)return;
+    var html='<div class="gsm-tabs">';
+    gsms.forEach(function(g,i){
+        html+='<div class="gsm-tab'+(i===0?' active':'')+'" onclick="switchGsm(this,\''+containerId+'\',\''+g.key+'\')">'+g.label+'</div>';
+    });
+    html+='</div>';
+    gsms.forEach(function(g,i){
+        var rows=data[g.key];
+        html+='<div class="gsm-panel'+(i===0?' active':'')+'" data-gsm="'+g.key+'">';
+        if(rows&&rows.length){
+            html+='<div class="tbl-wrap"><table><thead><tr>';
+            headers.forEach(function(h){html+='<th>'+h+'</th>';});
+            html+='</tr></thead><tbody>';
+            rows.forEach(function(r){
+                html+='<tr>';
+                r.forEach(function(v,vi){
+                    if(vi===0) html+='<td>'+(tableType==='slot'?v:fmtQty(v))+'</td>';
+                    else html+='<td>'+(v?'$ '+fmtNum(v):'-')+'</td>';
+                });
+                html+='</tr>';
+            });
+            html+='</tbody></table></div>';
+        } else {
+            html+='<div style="padding:12px;color:#64748b;font-size:13px">Contact for pricing.</div>';
+        }
+        html+='</div>';
+    });
+    c.innerHTML=html;
+}
+
+function fmtQty(n){return n>=1000?n.toLocaleString():n}
+function fmtNum(n){return n.toLocaleString()}
+
+var GSMS=[{key:"128",label:"128gsm or below"},{key:"157",label:"157gsm or below"},{key:"260",label:"260gsm or below"}];
+
+// ========= INIT TABLES =========
+
+function initTables(){
+    // HDB Standard
+    buildTable(HDB_STD,GSMS,['QTY','A5','A4','A3'],'hdb-sub-standard','qty');
+    // HDB Estate
+    buildTable(HDB_ESTATE,GSMS,['QTY','A5','A4','A3'],'hdb-sub-estate','qty');
+    // HDB Selected Block 通
+    buildTable(HDB_TONG,GSMS,['QTY','A5','A4','A3'],'hdb-sub-tong','qty');
+    // HDB Selected Blocks 不通
+    buildTable(HDB_BUTONG,GSMS,['QTY','A5','A4','A3'],'hdb-sub-butong','qty');
+
+    // HDB Letterbox (Solely Flyer rates)
+    var lbData={};
+    Object.keys(SOLELY).forEach(function(g){
+        lbData[g]=[['-',SOLELY[g].A5,SOLELY[g].A4]];
+    });
+    buildTable(lbData,GSMS,['','A5 per 1,000','A4 per 1,000'],'svc-letterbox','qty');
+
+    // Landed
+    buildTable(LANDED,GSMS,['QTY','A5','A4','A3'],'svc-landed','qty');
+    // Industrial (same data as landed)
+    buildTable(LANDED,GSMS,['QTY','A5','A4','A3'],'svc-industrial','qty');
+
+    // Walkway
+    buildTable(WALK_STD,GSMS,['Slot','A5','A4','A3'],'walk-sub-standard','slot');
+    buildTable(WALK_EXP,GSMS,['Slot','A5','A4','A3'],'walk-sub-express','slot');
+    buildTable(WALK_REMOTE,GSMS,['Slot','A5','A4','A3'],'walk-sub-remote','slot');
+    buildTable(WALK_EXPR,GSMS,['Slot','A5','A4','A3'],'walk-sub-remoteexp','slot');
+}
+
+// ========= NAVIGATION =========
+
+function switchService(){
+    var v=document.getElementById('mainService').value;
+    document.querySelectorAll('.svc-section').forEach(function(s){s.classList.remove('active');});
+    document.getElementById('svc-'+v).classList.add('active');
+    // Update qty label
+    var ql=document.getElementById('qtyLabel');
+    ql.textContent=v==='walkway'?'Enter Slots':'Enter Quantity';
+    document.getElementById('calcQty').placeholder=v==='walkway'?'e.g. 5':'e.g. 15000';
+    calcQuote();
+}
+
+function switchHdbSub(sub){
+    document.querySelectorAll('#svc-hdb .sub-section').forEach(function(s){s.classList.remove('active');});
+    document.getElementById('hdb-sub-'+sub).classList.add('active');
+    document.querySelectorAll('#hdbPills .pill').forEach(function(p){p.classList.remove('active');});
+    event.currentTarget.classList.add('active');
+    calcQuote();
+}
+
+function switchWalkSub(sub){
+    document.querySelectorAll('#svc-walkway .sub-section').forEach(function(s){s.classList.remove('active');});
+    document.getElementById('walk-sub-'+sub).classList.add('active');
+    document.querySelectorAll('#walkPills .pill').forEach(function(p){p.classList.remove('active');});
+    event.currentTarget.classList.add('active');
+    calcQuote();
+}
+
+function switchGsm(el,containerId,gsmKey){
+    var c=document.getElementById(containerId);
+    c.querySelectorAll('.gsm-tab').forEach(function(t){t.classList.remove('active');});
+    el.classList.add('active');
+    c.querySelectorAll('.gsm-panel').forEach(function(p){p.classList.remove('active');});
+    c.querySelector('.gsm-panel[data-gsm="'+gsmKey+'"]').classList.add('active');
+}
+
+// ========= CALCULATOR =========
+
+function prorate(tiers,qty,sizeIdx){
+    if(!tiers||!tiers.length)return 0;
+    for(var i=0;i<tiers.length;i++){
+        if(qty===tiers[i][0])return tiers[i][sizeIdx];
+        if(qty<tiers[i][0]){
+            if(i===0){
+                var calc = tiers[0][sizeIdx]*(qty/tiers[0][0]);
+                // Cap at tier 1 price
+                return Math.min(calc, tiers[0][sizeIdx]);
+            }
+            // Use the 1K tier unit rate for all proration
+            var unitRate = tiers[0][sizeIdx] / tiers[0][0];
+            var calc = unitRate * qty;
+            // Cap at next tier price
+            return Math.min(calc, tiers[i][sizeIdx]);
+        }
+    }
+    return null; // above max
+}
+
+function calcQuote(){
+    var svc=document.getElementById('mainService').value;
+    var size=document.getElementById('calcSize').value;
+    var gsm=document.getElementById('calcGsm').value;
+    var qty=parseFloat(document.getElementById('calcQty').value)||0;
+    var sizeIdx={A5:1,A4:2,A3:3}[size]||1;
+    var distCost=0;
+
+    if(svc==='hdb'){
+        var activeSub=document.querySelector('#svc-hdb .sub-section.active');
+        var subId=activeSub?activeSub.id.replace('hdb-sub-',''):'standard';
+        if(subId==='standard'){
+            var t=HDB_STD[gsm];var r=HDB_STD_RATE[gsm];
+            if(t&&r){
+                var p=prorate(t,qty,sizeIdx);
+                if(p!==null){distCost=p;}
+                else{var base=t[t.length-1][sizeIdx];var rate=r[size]||0;distCost=base+((qty-10000)/1000)*rate;}
+            }
+        } else if(subId==='estate'){
+            var t=HDB_ESTATE[gsm];var r=HDB_ESTATE_RATE[gsm];
+            if(t&&r){
+                var p=prorate(t,qty,sizeIdx);
+                if(p!==null){distCost=p;}
+                else{var base=t[t.length-1][sizeIdx];var rate=r[size]||0;distCost=base+((qty-4000)/1000)*rate;}
+            }
+        } else if(subId==='tong'){
+            var t=HDB_TONG[gsm];var r=HDB_TONG_RATE[gsm];
+            if(t&&r){
+                var p=prorate(t,qty,sizeIdx);
+                if(p!==null){distCost=p;}
+                else{var base=t[t.length-1][sizeIdx];var rate=r[size]||0;distCost=base+((qty-4000)/1000)*rate;}
+            }
+        } else if(subId==='butong'){
+            var t=HDB_BUTONG[gsm];var r=HDB_BUTONG_RATE[gsm];
+            if(t&&r){
+                var p=prorate(t,qty,sizeIdx);
+                if(p!==null){distCost=p;}
+                else{var base=t[t.length-1][sizeIdx];var rate=r[size]||0;distCost=base+((qty-4000)/1000)*rate;}
+            }
+        }
+    } else if(svc==='letterbox'){
+        var s=SOLELY[gsm];
+        if(s){distCost=(qty/1000)*(s[size]||0);}
+    } else if(svc==='landed'||svc==='industrial'){
+        var t=LANDED[gsm];var r=LANDED_RATE[gsm];
+        if(t&&r){
+            var p=prorate(t,qty,sizeIdx);
+            if(p!==null){distCost=p;}
+            else{var base=t[t.length-1][sizeIdx];distCost=base+((qty-4000)/1000)*(r[size]||0);}
+        }
+    } else if(svc==='walkway'){
+        var activeSub=document.querySelector('#svc-walkway .sub-section.active');
+        var subId=activeSub?activeSub.id.replace('walk-sub-',''):'standard';
+        var tbl,rates;
+        if(subId==='standard'){tbl=WALK_STD;rates=WALK_STD_RATE;}
+        else if(subId==='express'){tbl=WALK_EXP;rates=WALK_EXP_RATE;}
+        else if(subId==='remote'){tbl=WALK_REMOTE;rates=WALK_REMOTE_RATE;}
+        else{tbl=WALK_EXPR;rates=WALK_EXPR_RATE;}
+        var t=tbl[gsm];var r=rates[gsm];
+        if(t&&r&&qty>0){
+            if(qty<=4){
+                for(var i=0;i<t.length;i++){if(qty===t[i][0]){distCost=t[i][sizeIdx];break;}}
+            } else {
+                distCost=t[t.length-1][sizeIdx]+(qty-4)*(r[size]||0);
+            }
+        }
+    }
+
+    distCost=Math.round(distCost*100)/100;
+    document.getElementById('estCost').textContent='$'+distCost.toFixed(2);
+
+    // Add-ons
+    var expressQty=parseFloat(document.getElementById('addonExpress').value)||0;
+    var landmarkQty=parseFloat(document.getElementById('addonLandmark').value)||0;
+    var soloQty=parseFloat(document.getElementById('addonSolo').value)||0;
+    var multiQty=parseFloat(document.getElementById('addonMultiple').value)||0;
+
+    var expressRate=EXPRESS_RATE[svc]||20;
+    var expressCost=expressQty>0?Math.max((expressQty/1000)*expressRate,EXPRESS_MIN):0;
+    if(expressQty===0)expressCost=0;
+    var landmarkCost=landmarkQty*LANDMARK_RATE;
+
+    var soloRate=0;
+    if(SOLELY[gsm]&&SOLELY[gsm][size])soloRate=SOLELY[gsm][size];
+    var soloCost=(soloQty/1000)*soloRate;
+
+    var multiRate=size==='A5'?28:32; // tagalong rates HDB default
+    if(svc==='landed'||svc==='industrial'){multiRate=size==='A5'?48:52;}
+    var multiCost=(multiQty/1000)*multiRate;
+
+    var pickup=document.getElementById('pickupCheck').checked?PICKUP_FEE:0;
+    var grand=distCost+expressCost+landmarkCost+soloCost+multiCost+pickup;
+    grand=Math.round(grand*100)/100;
+    document.getElementById('grandTotal').textContent='$'+grand.toFixed(2);
+}
+
+// ========= INIT =========
+initTables();
+calcQuote();
+</script>
+</body>
+</html>
