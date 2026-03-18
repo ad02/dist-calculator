@@ -365,10 +365,16 @@ function prorate(tiers,qty,sizeIdx){
     for(var i=0;i<tiers.length;i++){
         if(qty===tiers[i][0])return tiers[i][sizeIdx];
         if(qty<tiers[i][0]){
-            if(i===0){return tiers[0][sizeIdx]*(qty/tiers[0][0]);}
+            if(i===0){
+                var calc = tiers[0][sizeIdx]*(qty/tiers[0][0]);
+                // Cap at tier 1 price
+                return Math.min(calc, tiers[0][sizeIdx]);
+            }
             var lo=tiers[i-1],hi=tiers[i];
             var frac=(qty-lo[0])/(hi[0]-lo[0]);
-            return lo[sizeIdx]+frac*(hi[sizeIdx]-lo[sizeIdx]);
+            var calc=lo[sizeIdx]+frac*(hi[sizeIdx]-lo[sizeIdx]);
+            // Cap at next tier price
+            return Math.min(calc, hi[sizeIdx]);
         }
     }
     return null; // above max
