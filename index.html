@@ -61,6 +61,13 @@ td:first-child{font-weight:500;color:var(--pri)}
 .grand-total{background:#fffbeb;border:2px solid #fbbf24;border-radius:10px;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
 .grand-total .lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--pri)}
 .grand-total .val{font-size:28px;font-weight:800;color:var(--ok)}
+/* Multiple flyer design rows */
+.design-rows{margin-top:14px}
+.design-row{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:10px}
+.design-row .dlabel{font-size:13px;font-weight:600;color:var(--pri);min-width:110px;padding-bottom:8px}
+.design-row .field{display:flex;flex-direction:column;gap:4px}
+.design-row .field label{font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.3px}
+.design-row .field select,.design-row .field input{width:130px}
 /* Sections */
 .svc-section{display:none}.svc-section.active{display:block}
 .sub-section{display:none}.sub-section.active{display:block}
@@ -137,8 +144,9 @@ td:first-child{font-weight:500;color:var(--pri)}
 <div class="field"><label>Express Services</label><input type="number" id="addonExpress" min="0" value="0" oninput="calcQuote()"/></div>
 <div class="field"><label>Add. Landmark</label><input type="number" id="addonLandmark" min="0" value="0" oninput="calcQuote()"/></div>
 <div class="field"><label>Solo Flyer (QTY)</label><input type="number" id="addonSolo" min="0" value="0" oninput="calcQuote()"/></div>
-<div class="field"><label>Multiple (QTY)</label><input type="number" id="addonMultiple" min="0" value="0" oninput="calcQuote()"/></div>
+<div class="field"><label>Multiple Flyer Per Unit</label><input type="number" id="addonMultiCount" min="0" max="10" value="0" oninput="updateMultipleDesigns()"/></div>
 </div>
+<div class="design-rows" id="multiDesignRows"></div>
 </div>
 
 <div class="pickup-box">
@@ -358,6 +366,51 @@ function switchGsm(el,containerId,gsmKey){
     c.querySelector('.gsm-panel[data-gsm="'+gsmKey+'"]').classList.add('active');
 }
 
+// ========= MULTIPLE FLYER DESIGNS =========
+
+function updateMultipleDesigns(){
+    var count=parseInt(document.getElementById('addonMultiCount').value)||0;
+    var container=document.getElementById('multiDesignRows');
+    var html='';
+    for(var d=0;d<count;d++){
+        html+='<div class="design-row">';
+        html+='<div class="dlabel">'+(d+1)+'. DESIGN #'+(d+1)+':</div>';
+        html+='<div class="field"><label>Size</label><select id="multiSize'+d+'" onchange="calcQuote()">';
+        html+='<option value="A5">A5</option><option value="A4" selected>A4</option><option value="A3">A3</option>';
+        html+='</select></div>';
+        html+='<div class="field"><label>GSM</label><select id="multiGsm'+d+'" onchange="calcQuote()">';
+        html+='<option value="128">128gsm</option><option value="157">157gsm</option><option value="260">260gsm</option>';
+        html+='</select></div>';
+        html+='<div class="field"><label>Quantity</label><input type="number" id="multiQty'+d+'" min="0" step="1" placeholder="e.g., 5000" oninput="calcQuote()"/></div>';
+        html+='</div>';
+    }
+    container.innerHTML=html;
+    calcQuote();
+}
+
+function getServiceRate(){
+    var svc=document.getElementById('mainService').value;
+    if(svc==='hdb'){
+        var activeSub=document.querySelector('#svc-hdb .sub-section.active');
+        var subId=activeSub?activeSub.id.replace('hdb-sub-',''):'standard';
+        if(subId==='standard') return HDB_STD_RATE;
+        if(subId==='estate') return HDB_ESTATE_RATE;
+        if(subId==='tong') return HDB_TONG_RATE;
+        if(subId==='butong') return HDB_BUTONG_RATE;
+    }
+    if(svc==='landed'||svc==='industrial') return LANDED_RATE;
+    if(svc==='letterbox') return HDB_STD_RATE;
+    if(svc==='walkway'){
+        var activeSub=document.querySelector('#svc-walkway .sub-section.active');
+        var subId=activeSub?activeSub.id.replace('walk-sub-',''):'standard';
+        if(subId==='standard') return WALK_STD_RATE;
+        if(subId==='express') return WALK_EXP_RATE;
+        if(subId==='remote') return WALK_REMOTE_RATE;
+        return WALK_EXPR_RATE;
+    }
+    return HDB_STD_RATE;
+}
+
 // ========= CALCULATOR =========
 
 function prorate(tiers,qty,sizeIdx){
@@ -455,7 +508,6 @@ function calcQuote(){
     var expressQty=parseFloat(document.getElementById('addonExpress').value)||0;
     var landmarkQty=parseFloat(document.getElementById('addonLandmark').value)||0;
     var soloQty=parseFloat(document.getElementById('addonSolo').value)||0;
-    var multiQty=parseFloat(document.getElementById('addonMultiple').value)||0;
 
     var expressRate=EXPRESS_RATE[svc]||20;
     var expressCost=expressQty>0?Math.max((expressQty/1000)*expressRate,EXPRESS_MIN):0;
@@ -466,9 +518,42 @@ function calcQuote(){
     if(SOLELY[gsm]&&SOLELY[gsm][size])soloRate=SOLELY[gsm][size];
     var soloCost=(soloQty/1000)*soloRate;
 
-    var multiRate=size==='A5'?28:32; // tagalong rates HDB default
-    if(svc==='landed'||svc==='industrial'){multiRate=size==='A5'?48:52;}
-    var multiCost=(multiQty/1000)*multiRate;
+    // Multiple Flyer designs
+    var multiCount=parseInt(document.getElementById('addonMultiCount').value)||0;
+    var multiCost=0;
+    if(multiCount>0){
+        // Collect all designs
+        var designs=[];
+        for(var d=0;d<multiCount;d++){
+            var dSize=document.getElementById('multiSize'+d);
+            var dGsm=document.getElementById('multiGsm'+d);
+            var dQty=document.getElementById('multiQty'+d);
+            if(dSize&&dGsm&&dQty){
+                designs.push({size:dSize.value,gsm:dGsm.value,qty:parseFloat(dQty.value)||0});
+            }
+        }
+        // Find highest GSM across all designs
+        var gsmOrder={'128':1,'157':2,'260':3};
+        var highestGsm='128';
+        designs.forEach(function(d){
+            if((gsmOrder[d.gsm]||0)>(gsmOrder[highestGsm]||0)) highestGsm=d.gsm;
+        });
+        // Get rate table for current service type
+        var rateTable=getServiceRate();
+        var rates=rateTable[highestGsm];
+        if(rates){
+            var firstQty=designs.length>0?designs[0].qty:0;
+            designs.forEach(function(d,idx){
+                var fullRate=rates[d.size]||0;
+                var rate=fullRate;
+                // 2nd design onwards: tagalong discount if 1st design qty >= 10K
+                if(idx>0&&firstQty>=10000){
+                    rate=fullRate-10;
+                }
+                multiCost+=(d.qty/1000)*rate;
+            });
+        }
+    }
 
     var pickup=document.getElementById('pickupCheck').checked?PICKUP_FEE:0;
     var grand=distCost+expressCost+landmarkCost+soloCost+multiCost+pickup;
