@@ -411,6 +411,20 @@ function getServiceRate(){
     return HDB_STD_RATE;
 }
 
+function getServiceTiers(){
+    var svc=document.getElementById('mainService').value;
+    if(svc==='hdb'){
+        var activeSub=document.querySelector('#svc-hdb .sub-section.active');
+        var subId=activeSub?activeSub.id.replace('hdb-sub-',''):'standard';
+        if(subId==='standard') return HDB_STD;
+        if(subId==='estate') return HDB_ESTATE;
+        if(subId==='tong') return HDB_TONG;
+        if(subId==='butong') return HDB_BUTONG;
+    }
+    if(svc==='landed'||svc==='industrial') return LANDED;
+    return null;
+}
+
 // ========= CALCULATOR =========
 
 function prorate(tiers,qty,sizeIdx){
@@ -538,19 +552,31 @@ function calcQuote(){
         designs.forEach(function(d){
             if((gsmOrder[d.gsm]||0)>(gsmOrder[highestGsm]||0)) highestGsm=d.gsm;
         });
-        // Get rate table for current service type
+        // Get rate table and tier table for current service type
         var rateTable=getServiceRate();
         var rates=rateTable[highestGsm];
+        var tierTable=getServiceTiers();
+        var tiers=tierTable?tierTable[highestGsm]:null;
         if(rates){
             var firstQty=designs.length>0?designs[0].qty:0;
             designs.forEach(function(d,idx){
-                var fullRate=rates[d.size]||0;
-                var rate=fullRate;
-                // 2nd design onwards: tagalong discount if 1st design qty >= 10K
-                if(idx>0&&firstQty>=10000){
-                    rate=fullRate-10;
+                var isTagalong=idx>0&&firstQty>=5000;
+                var cost=0;
+                if(d.qty>=3000||!tiers){
+                    // Per-1K rate pricing (3K+ or walkway/letterbox)
+                    var fullRate=rates[d.size]||0;
+                    var rate=isTagalong?fullRate-10:fullRate;
+                    cost=(d.qty/1000)*rate;
+                } else if(d.qty>0){
+                    // Tier-based pricing (< 3K)
+                    var sizeIdx={A5:1,A4:2,A3:3}[d.size]||1;
+                    var p=prorate(tiers,d.qty,sizeIdx);
+                    if(p!==null){
+                        cost=p;
+                        if(isTagalong) cost=cost-10;
+                    }
                 }
-                multiCost+=(d.qty/1000)*rate;
+                multiCost+=cost;
             });
         }
     }
