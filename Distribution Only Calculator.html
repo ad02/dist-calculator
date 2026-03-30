@@ -558,25 +558,36 @@ function calcQuote(){
         var tierTable=getServiceTiers();
         var tiers=tierTable?tierTable[highestGsm]:null;
         if(rates){
-            var firstQty=designs.length>0?designs[0].qty:0;
-            designs.forEach(function(d,idx){
-                var isTagalong=idx>0&&firstQty>=5000;
-                var cost=0;
-                if(d.qty>=3000||!tiers){
-                    // Per-1K rate pricing (3K+ or walkway/letterbox)
-                    var fullRate=rates[d.size]||0;
-                    var rate=isTagalong?fullRate-10:fullRate;
-                    cost=(d.qty/1000)*rate;
-                } else if(d.qty>0){
-                    // Tier-based pricing (< 3K)
-                    var sizeIdx={A5:1,A4:2,A3:3}[d.size]||1;
-                    var p=prorate(tiers,d.qty,sizeIdx);
-                    if(p!==null){
-                        cost=p;
-                        if(isTagalong) cost=cost-10;
-                    }
+            // Split designs into tier-priced (<3K) and rate-priced (>=3K)
+            var tierGroup=[];
+            var rateGroup=[];
+            designs.forEach(function(d){
+                if(d.qty>0){
+                    if(d.qty>=3000||!tiers) rateGroup.push(d);
+                    else tierGroup.push(d);
                 }
-                multiCost+=cost;
+            });
+            // Tier-priced: combine quantities, single tier lookup
+            if(tierGroup.length>0){
+                var combinedQty=0;
+                var maxSizeIdx=0;
+                tierGroup.forEach(function(d){
+                    combinedQty+=d.qty;
+                    var si={A5:1,A4:2,A3:3}[d.size]||1;
+                    if(si>maxSizeIdx) maxSizeIdx=si;
+                });
+                var p=prorate(tiers,combinedQty,maxSizeIdx);
+                if(p!==null){
+                    multiCost+=p;
+                    if(tierGroup.length>1) multiCost-=10;
+                }
+            }
+            // Rate-priced: independent per-1K rates
+            rateGroup.forEach(function(d,rIdx){
+                var fullRate=rates[d.size]||0;
+                var isTagalong=rIdx>0&&rateGroup[0].qty>=5000;
+                var rate=isTagalong?fullRate-10:fullRate;
+                multiCost+=(d.qty/1000)*rate;
             });
         }
     }
