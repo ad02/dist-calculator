@@ -578,8 +578,12 @@ function calcQuote(){
                 });
                 var p=prorate(tiers,combinedQty,maxSizeIdx);
                 if(p!==null){
-                    multiCost+=p;
-                    if(tierGroup.length>1) multiCost-=10;
+                    var tierCost=p;
+                    if(tierGroup.length>1) tierCost-=10;
+                    // MOQ: minimum charge is 1K tier price
+                    var moq=tiers[0][maxSizeIdx];
+                    if(tierCost<moq) tierCost=moq;
+                    multiCost+=tierCost;
                 }
             }
             // Rate-priced: independent per-1K rates
