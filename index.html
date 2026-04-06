@@ -253,6 +253,20 @@ var WALK_EXPR={
 };
 var WALK_EXPR_RATE={"128":{A5:164,A4:169,A3:204},"157":{A5:164,A4:169,A3:204},"260":{A5:164,A4:169,A3:204}};
 
+// HDB Letterbox: derived from HDB Standard, minus $2 per 1K qty
+var HDB_LB={};
+Object.keys(HDB_STD).forEach(function(gsm){
+    HDB_LB[gsm]=HDB_STD[gsm].map(function(row){
+        var d=(row[0]/1000)*2;
+        return [row[0],row[1]-d,row[2]-d,row[3]-d];
+    });
+});
+var HDB_LB_RATE={};
+Object.keys(HDB_STD_RATE).forEach(function(gsm){
+    var r=HDB_STD_RATE[gsm];
+    HDB_LB_RATE[gsm]={A5:r.A5-2,A4:r.A4-2,A3:r.A3-2};
+});
+
 // Express surcharge rates
 var EXPRESS_RATE={hdb:20,landed:40,industrial:40,letterbox:20};
 var EXPRESS_MIN=150;
@@ -310,12 +324,8 @@ function initTables(){
     // HDB Selected Blocks 不通
     buildTable(HDB_BUTONG,GSMS,['QTY','A5','A4','A3'],'hdb-sub-butong','qty');
 
-    // HDB Letterbox (Solely Flyer rates)
-    var lbData={};
-    Object.keys(SOLELY).forEach(function(g){
-        lbData[g]=[['-',SOLELY[g].A5,SOLELY[g].A4]];
-    });
-    buildTable(lbData,GSMS,['','A5 per 1,000','A4 per 1,000'],'svc-letterbox','qty');
+    // HDB Letterbox
+    buildTable(HDB_LB,GSMS,['QTY','A5','A4','A3'],'svc-letterbox','qty');
 
     // Landed
     buildTable(LANDED,GSMS,['QTY','A5','A4','A3'],'svc-landed','qty');
@@ -399,7 +409,7 @@ function getServiceRate(){
         if(subId==='butong') return HDB_BUTONG_RATE;
     }
     if(svc==='landed'||svc==='industrial') return LANDED_RATE;
-    if(svc==='letterbox') return HDB_STD_RATE;
+    if(svc==='letterbox') return HDB_LB_RATE;
     if(svc==='walkway'){
         var activeSub=document.querySelector('#svc-walkway .sub-section.active');
         var subId=activeSub?activeSub.id.replace('walk-sub-',''):'standard';
@@ -421,6 +431,7 @@ function getServiceTiers(){
         if(subId==='tong') return HDB_TONG;
         if(subId==='butong') return HDB_BUTONG;
     }
+    if(svc==='letterbox') return HDB_LB;
     if(svc==='landed'||svc==='industrial') return LANDED;
     return null;
 }
@@ -488,8 +499,12 @@ function calcQuote(){
             }
         }
     } else if(svc==='letterbox'){
-        var s=SOLELY[gsm];
-        if(s){distCost=(qty/1000)*(s[size]||0);}
+        var t=HDB_LB[gsm];var r=HDB_LB_RATE[gsm];
+        if(t&&r){
+            var p=prorate(t,qty,sizeIdx);
+            if(p!==null){distCost=p;}
+            else{var base=t[t.length-1][sizeIdx];var rate=r[size]||0;distCost=base+((qty-10000)/1000)*rate;}
+        }
     } else if(svc==='landed'||svc==='industrial'){
         var t=LANDED[gsm];var r=LANDED_RATE[gsm];
         if(t&&r){
