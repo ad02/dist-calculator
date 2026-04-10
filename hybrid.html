@@ -271,53 +271,97 @@ var HYBRID_PRINT={
 }
 };
 
-// ========= DISTRIBUTION RATES (per 1K qty) =========
-// {type: {gsm: {size: rate}}}
-var DIST_RATES={
-"hdb-std":{"80":{A5:38,A4:44,A3:64},"128":{A5:38,A4:44,A3:64},"157":{A5:40,A4:49,A3:69},"260":{A5:44,A4:64,A3:104}},
-"hdb-estate":{"80":{A5:79,A4:85,A3:105},"128":{A5:79,A4:85,A3:105},"157":{A5:81,A4:90,A3:110},"260":{A5:85,A4:105,A3:135}},
-"hdb-tong":{"80":{A5:109,A4:117,A3:137},"128":{A5:109,A4:117,A3:137},"157":{A5:111,A4:122,A3:142},"260":{A5:115,A4:137,A3:167}},
-"hdb-butong":{"80":{A5:149,A4:157,A3:177},"128":{A5:149,A4:157,A3:177},"157":{A5:151,A4:162,A3:182},"260":{A5:155,A4:177,A3:207}},
-"hdb-lb":{"80":{A5:36,A4:42,A3:62},"128":{A5:36,A4:42,A3:62},"157":{A5:38,A4:47,A3:67},"260":{A5:42,A4:62,A3:102}},
-"landed":{"80":{A5:71,A4:76,A3:111},"128":{A5:71,A4:76,A3:111},"157":{A5:74,A4:91,A3:116},"260":{A5:76,A4:111,A3:191}},
-"solo":{"80":{A5:15,A4:30,A3:30},"128":{A5:15,A4:30,A3:30},"157":{A5:17,A4:32,A3:32},"260":{A5:21,A4:36,A3:36}},
-"walk-std":{"80":{A5:69,A4:74,A3:109},"128":{A5:69,A4:74,A3:109},"157":{A5:72,A4:89,A3:114},"260":{A5:74,A4:109,A3:189}},
-"walk-remote":{"80":{A5:99,A4:104,A3:139},"128":{A5:99,A4:104,A3:139},"157":{A5:102,A4:119,A3:144},"260":{A5:104,A4:139,A3:219}},
-"walk-exp":{"80":{A5:134,A4:139,A3:174},"128":{A5:134,A4:139,A3:174},"157":{A5:137,A4:154,A3:179},"260":{A5:139,A4:174,A3:254}},
-"walk-expr":{"80":{A5:164,A4:169,A3:204},"128":{A5:164,A4:169,A3:204},"157":{A5:167,A4:184,A3:209},"260":{A5:169,A4:204,A3:284}}
+// ========= DISTRIBUTION DATA (same as Distribution Only Calculator) =========
+// [qty, A5, A4, A3]
+var HDB_STD={
+"128":[[1000,149,155,175],[2000,177,189,229],[3000,194,212,272],[4000,212,236,316],[5000,240,270,370],[6000,288,324,444],[7000,301,343,483],[8000,344,392,552],[9000,360,418,594],[10000,380,440,640]],
+"157":[[1000,151,160,185],[2000,181,199,233],[3000,200,227,292],[4000,230,266,341],[5000,250,295,400],[6000,300,354,479],[7000,315,378,523],[8000,348,432,597],[9000,372,459,644],[10000,400,490,690]],
+"260":[[1000,155,175,215],[2000,189,259,309],[3000,212,272,392],[4000,236,316,476],[5000,270,370,570],[6000,324,396,684],[7000,343,483,763],[8000,392,552,872],[9000,418,594,954],[10000,440,640,1040]]
 };
+var HDB_STD_RATE={"128":{A5:38,A4:44,A3:64},"157":{A5:40,A4:49,A3:69},"260":{A5:44,A4:64,A3:104}};
 
-// Walkway tier data [slot, A5, A4, A3]
-var WALK_TIERS={
-"walk-std":{
-"80":[[1,142,147,182],[2,178,188,258],[3,252,278,387],[4,276,296,436]],
+var HDB_ESTATE={
+"128":[[1000,151,157,177],[2000,218,230,270],[3000,297,315,375],[4000,316,340,420]],
+"157":[[1000,153,160,185],[2000,222,240,280],[3000,303,330,390],[4000,324,360,440]],
+"260":[[1000,157,177,215],[2000,230,270,350],[3000,315,375,495],[4000,340,420,540]]
+};
+var HDB_ESTATE_RATE={"128":{A5:79,A4:85,A3:105},"157":{A5:81,A4:90,A3:110},"260":{A5:85,A4:105,A3:135}};
+
+var HDB_TONG={
+"128":[[1000,179,182,202],[2000,278,294,334],[3000,387,411,471],[4000,436,468,548]],
+"157":[[1000,181,187,207],[2000,282,304,344],[3000,393,426,486],[4000,444,488,568]],
+"260":[[1000,185,202,242],[2000,290,334,414],[3000,405,471,591],[4000,460,548,668]]
+};
+var HDB_TONG_RATE={"128":{A5:109,A4:117,A3:137},"157":{A5:111,A4:122,A3:142},"260":{A5:115,A4:137,A3:167}};
+
+var HDB_BUTONG={
+"128":[[1000,219,227,247],[2000,359,375,415],[3000,507,531,591],[4000,596,628,708]],
+"157":[[1000,221,232,252],[2000,363,385,425],[3000,513,546,606],[4000,604,648,728]],
+"260":[[1000,225,247,287],[2000,371,415,495],[3000,525,591,711],[4000,620,708,828]]
+};
+var HDB_BUTONG_RATE={"128":{A5:149,A4:157,A3:177},"157":{A5:151,A4:162,A3:182},"260":{A5:155,A4:177,A3:207}};
+
+var SOLELY={"128":{A5:15,A4:30},"157":{A5:17,A4:32},"260":{A5:21,A4:36}};
+
+var LANDED={
+"128":[[1000,189,194,229],[2000,213,223,293],[3000,258,284,393],[4000,284,304,444]],
+"157":[[1000,192,219,234],[2000,219,253,298],[3000,282,323,398],[4000,296,364,464]],
+"260":[[1000,194,229,309],[2000,223,293,453],[3000,284,393,633],[4000,304,444,764]]
+};
+var LANDED_RATE={"128":{A5:71,A4:76,A3:111},"157":{A5:74,A4:91,A3:116},"260":{A5:76,A4:111,A3:191}};
+
+// HDB Letterbox: HDB Standard minus $2 per 1K qty
+var HDB_LB={};
+Object.keys(HDB_STD).forEach(function(g){
+    HDB_LB[g]=HDB_STD[g].map(function(r){var d=(r[0]/1000)*2;return [r[0],r[1]-d,r[2]-d,r[3]-d];});
+});
+var HDB_LB_RATE={};
+Object.keys(HDB_STD_RATE).forEach(function(g){
+    var r=HDB_STD_RATE[g]; HDB_LB_RATE[g]={A5:r.A5-2,A4:r.A4-2,A3:r.A3-2};
+});
+
+// Walkway [slot, A5, A4, A3]
+var WALK_STD={
 "128":[[1,142,147,182],[2,178,188,258],[3,252,278,387],[4,276,296,436]],
 "157":[[1,145,172,187],[2,184,218,263],[3,276,317,392],[4,288,356,456]],
 "260":[[1,147,182,262],[2,188,258,418],[3,278,387,627],[4,296,436,756]]
-},
-"walk-remote":{
-"80":[[1,172,177,212],[2,238,248,318],[3,342,357,477],[4,396,416,556]],
+};
+var WALK_STD_RATE={"128":{A5:69,A4:74,A3:109},"157":{A5:72,A4:89,A3:114},"260":{A5:74,A4:109,A3:189}};
+var WALK_REMOTE={
 "128":[[1,172,177,212],[2,238,248,318],[3,342,357,477],[4,396,416,556]],
 "157":[[1,175,202,217],[2,244,278,323],[3,351,369,482],[4,408,476,576]],
 "260":[[1,177,212,292],[2,248,318,478],[3,368,466,717],[4,416,556,876]]
-},
-"walk-exp":{
-"80":[[1,207,212,247],[2,309,318,388],[3,447,473,582],[4,536,556,696]],
+};
+var WALK_REMOTE_RATE={"128":{A5:99,A4:104,A3:139},"157":{A5:102,A4:119,A3:144},"260":{A5:104,A4:139,A3:219}};
+var WALK_EXP={
 "128":[[1,207,212,247],[2,309,318,388],[3,447,473,582],[4,536,556,696]],
 "157":[[1,210,237,252],[2,315,348,393],[3,456,512,587],[4,548,616,716]],
 "260":[[1,212,247,327],[2,319,388,548],[3,473,582,822],[4,556,696,1016]]
-},
-"walk-expr":{
-"80":[[1,237,242,277],[2,369,379,449],[3,537,552,672],[4,656,676,816]],
+};
+var WALK_EXP_RATE={"128":{A5:134,A4:139,A3:174},"157":{A5:137,A4:154,A3:179},"260":{A5:139,A4:174,A3:254}};
+var WALK_EXPR={
 "128":[[1,237,242,277],[2,369,379,449],[3,537,552,672],[4,656,676,816]],
 "157":[[1,240,267,282],[2,375,409,454],[3,546,591,677],[4,668,736,836]],
 "260":[[1,242,277,357],[2,379,449,609],[3,563,661,912],[4,676,816,1136]]
-}
 };
+var WALK_EXPR_RATE={"128":{A5:164,A4:169,A3:204},"157":{A5:167,A4:184,A3:209},"260":{A5:169,A4:204,A3:284}};
 
-// Industrial uses same rates as Landed
-DIST_RATES["industrial"]=DIST_RATES["landed"];
-DIST_RATES["ind-solo"]=DIST_RATES["solo"];
+// Map data-type to tier/rate tables
+var DIST_TIER_MAP={
+    'hdb-std':   {tiers:HDB_STD, rate:HDB_STD_RATE, maxQty:10000},
+    'hdb-estate':{tiers:HDB_ESTATE, rate:HDB_ESTATE_RATE, maxQty:4000},
+    'hdb-tong':  {tiers:HDB_TONG, rate:HDB_TONG_RATE, maxQty:4000},
+    'hdb-butong':{tiers:HDB_BUTONG, rate:HDB_BUTONG_RATE, maxQty:4000},
+    'hdb-lb':    {tiers:HDB_LB, rate:HDB_LB_RATE, maxQty:10000},
+    'landed':    {tiers:LANDED, rate:LANDED_RATE, maxQty:4000},
+    'industrial':{tiers:LANDED, rate:LANDED_RATE, maxQty:4000}
+};
+var WALK_MAP={
+    'walk-std':   {tiers:WALK_STD, rate:WALK_STD_RATE},
+    'walk-remote':{tiers:WALK_REMOTE, rate:WALK_REMOTE_RATE},
+    'walk-exp':   {tiers:WALK_EXP, rate:WALK_EXP_RATE},
+    'walk-expr':  {tiers:WALK_EXPR, rate:WALK_EXPR_RATE}
+};
 
 var EXPRESS_RATE_PER_K={hdb:20,landed:40,industrial:40};
 var EXPRESS_MIN=150;
@@ -335,32 +379,56 @@ function getPrintCost(size, gsm, side, qty) {
     return {cost:tiers[tiers.length - 1][col], exceeded:true};
 }
 
-// ========= WALKWAY: tier-based lookup =========
-function getWalkCost(type, gsm, size, slots) {
-    var sizeIdx = {A5:1, A4:2, A3:3}[size] || 1;
-    var tiers = WALK_TIERS[type] && WALK_TIERS[type][gsm];
-    if (!tiers || slots <= 0) return 0;
-    // Within tier range: exact match
+// ========= DISTRIBUTION: prorate (same logic as Distribution Only) =========
+function prorate(tiers, qty, sizeIdx) {
+    if (!tiers || !tiers.length) return 0;
     for (var i = 0; i < tiers.length; i++) {
-        if (slots === tiers[i][0]) return tiers[i][sizeIdx];
+        if (qty === tiers[i][0]) return tiers[i][sizeIdx];
+        if (qty < tiers[i][0]) {
+            if (i === 0) {
+                var calc = tiers[0][sizeIdx] * (qty / tiers[0][0]);
+                return Math.min(calc, tiers[0][sizeIdx]);
+            }
+            var unitRate = tiers[i-1][sizeIdx] / tiers[i-1][0];
+            var calc = unitRate * qty;
+            return Math.min(calc, tiers[i][sizeIdx]);
+        }
     }
-    // Above 4 slots: base + extra slots at per-slot rate
-    if (slots > 4) {
-        var base = tiers[tiers.length - 1][sizeIdx];
-        var rate = getDistRate(type, gsm, size);
-        return base + (slots - 4) * rate;
-    }
-    // Below max tier but not exact: shouldn't happen for slots (integers)
-    return 0;
+    return null; // above max tier
 }
 
-// ========= DISTRIBUTION RATE LOOKUP =========
-function getDistRate(type, gsm, size) {
-    var table = DIST_RATES[type];
-    if (!table) return 0;
-    var gsmData = table[gsm];
-    if (!gsmData) return 0;
-    return gsmData[size] || 0;
+function getDistCost(type, gsm, size, qty) {
+    var sizeIdx = {A5:1, A4:2, A3:3}[size] || 1;
+    var map = DIST_TIER_MAP[type];
+    if (!map) return 0;
+    // 80gsm uses same rates as 128gsm
+    var g = (gsm === '80') ? '128' : gsm;
+    var t = map.tiers[g];
+    var r = map.rate[g];
+    if (!t || !r) return 0;
+    var p = prorate(t, qty, sizeIdx);
+    if (p !== null) return p;
+    // Above max tier: base + extra at per-1K rate
+    var base = t[t.length-1][sizeIdx];
+    var rate = r[size] || 0;
+    return base + ((qty - map.maxQty) / 1000) * rate;
+}
+
+function getWalkCost(type, gsm, size, slots) {
+    var sizeIdx = {A5:1, A4:2, A3:3}[size] || 1;
+    var map = WALK_MAP[type];
+    if (!map) return 0;
+    var g = (gsm === '80') ? '128' : gsm;
+    var t = map.tiers[g];
+    var r = map.rate[g];
+    if (!t || !r) return 0;
+    for (var i = 0; i < t.length; i++) {
+        if (slots === t[i][0]) return t[i][sizeIdx];
+    }
+    if (slots > 4) {
+        return t[t.length-1][sizeIdx] + (slots - 4) * (r[size] || 0);
+    }
+    return 0;
 }
 
 // ========= MAIN UPDATE =========
@@ -375,7 +443,7 @@ function update() {
     var dH = '<div class="breakdown-title">Distribution Services</div>';
     var hasP = false, hasD = false;
 
-    // 1. Printing cost
+    // 1. Printing cost (next tier up, no proration)
     if (qty > 0) {
         var result = getPrintCost(size, gsm, side, qty);
         if (result.cost > 0) {
@@ -408,7 +476,7 @@ function update() {
         }
     });
 
-    // 2. Distribution costs
+    // 2. Distribution costs (tier-based proration, same as Distribution Only)
     document.querySelectorAll('.d-val').forEach(function(input) {
         var val = parseFloat(input.value) || 0;
         if (val <= 0) return;
@@ -423,27 +491,26 @@ function update() {
             cost = Math.max((val / 1000) * EXPRESS_RATE_PER_K.landed, EXPRESS_MIN);
         } else if (type === 'landmark' || type === 'landed-landmark' || type === 'ind-landmark') {
             cost = val * LANDMARK_RATE;
-        } else if (type === 'multi') {
-            // HDB: tagalong = HDB std rate - $10/k
-            var baseRate = getDistRate('hdb-std', gsm, size);
-            cost = (val / 1000) * Math.max(baseRate - 10, 0);
-        } else if (type === 'landed-multi' || type === 'ind-multi') {
-            // Landed/Industrial: tagalong = landed rate - $10/k
-            var baseRate = getDistRate('landed', gsm, size);
-            cost = (val / 1000) * Math.max(baseRate - 10, 0);
+        } else if (type === 'solo' || type === 'landed-solo' || type === 'ind-solo') {
+            var g = (gsm === '80') ? '128' : gsm;
+            var s = SOLELY[g];
+            if (s) cost = (val / 1000) * (s[size] || 0);
+        } else if (type === 'multi' || type === 'landed-multi' || type === 'ind-multi') {
+            // Multiple flyer: use appropriate base rate - $10/k tagalong
+            var g = (gsm === '80') ? '128' : gsm;
+            var baseRate;
+            if (type === 'multi') baseRate = HDB_STD_RATE[g];
+            else baseRate = LANDED_RATE[g];
+            if (baseRate) cost = (val / 1000) * Math.max((baseRate[size] || 0) - 10, 0);
         } else if (type.indexOf('walk-') === 0) {
-            // Walkway: tier-based by slot count
             cost = getWalkCost(type, gsm, size, val);
-        } else if (type === 'landed-solo' || type === 'ind-solo') {
-            var rate = getDistRate('solo', gsm, size);
-            cost = (val / 1000) * rate;
-        } else {
-            // Per-1K rate (hdb-std, hdb-estate, hdb-tong, hdb-butong, hdb-lb, landed, industrial, solo)
-            var rate = getDistRate(type, gsm, size);
-            cost = (val / 1000) * rate;
+        } else if (DIST_TIER_MAP[type]) {
+            // Tier-based distribution (HDB, Estate, Tong, Butong, Letterbox, Landed, Industrial)
+            cost = getDistCost(type, gsm, size, val);
         }
 
         if (cost > 0) {
+            cost = Math.round(cost * 100) / 100;
             dTotal += cost;
             dH += '<div class="summary-line"><span>' + label + ' x' + val.toLocaleString() + '</span><b>$' + cost.toFixed(2) + '</b></div>';
             hasD = true;
