@@ -184,6 +184,20 @@
         <div class="dist-container">
             <div class="card">
                 <div class="card-header">2. HDB Distribution Services</div>
+                <div style="padding:8px 15px; background:#f1f5f9; border-bottom:1px solid var(--border); display:flex; gap:12px; align-items:center;">
+                    <span class="col-label" style="margin:0; white-space:nowrap;">Flyer Size</span>
+                    <select id="dSize" onchange="update()" style="width:auto;">
+                        <option value="A5">A5</option>
+                        <option value="A4">A4</option>
+                        <option value="A3">A3</option>
+                    </select>
+                    <span class="col-label" style="margin:0; white-space:nowrap;">Paper GSM</span>
+                    <select id="dGsm" onchange="update()" style="width:auto;">
+                        <option value="128">128gsm</option>
+                        <option value="157">157gsm</option>
+                        <option value="260">260gsm</option>
+                    </select>
+                </div>
                 <div class="item-row"><label>HDB Landmark</label><input type="number" class="d-val" data-type="hdb-std" oninput="update()"></div>
                 <div class="item-row"><label>HDB Selected Estate</label><input type="number" class="d-val" data-type="hdb-estate" oninput="update()"></div>
                 <div class="item-row"><label>HDB Selected Blocks (通)</label><input type="number" class="d-val" data-type="hdb-tong" oninput="update()"></div>
@@ -477,6 +491,9 @@ function update() {
     });
 
     // 2. Distribution costs (tier-based proration, same as Distribution Only)
+    var dSize = document.getElementById('dSize').value;
+    var dGsm = document.getElementById('dGsm').value;
+
     document.querySelectorAll('.d-val').forEach(function(input) {
         var val = parseFloat(input.value) || 0;
         if (val <= 0) return;
@@ -492,21 +509,17 @@ function update() {
         } else if (type === 'landmark' || type === 'landed-landmark' || type === 'ind-landmark') {
             cost = val * LANDMARK_RATE;
         } else if (type === 'solo' || type === 'landed-solo' || type === 'ind-solo') {
-            var g = (gsm === '80') ? '128' : gsm;
-            var s = SOLELY[g];
-            if (s) cost = (val / 1000) * (s[size] || 0);
+            var s = SOLELY[dGsm];
+            if (s) cost = (val / 1000) * (s[dSize] || 0);
         } else if (type === 'multi' || type === 'landed-multi' || type === 'ind-multi') {
-            // Multiple flyer: use appropriate base rate - $10/k tagalong
-            var g = (gsm === '80') ? '128' : gsm;
             var baseRate;
-            if (type === 'multi') baseRate = HDB_STD_RATE[g];
-            else baseRate = LANDED_RATE[g];
-            if (baseRate) cost = (val / 1000) * Math.max((baseRate[size] || 0) - 10, 0);
+            if (type === 'multi') baseRate = HDB_STD_RATE[dGsm];
+            else baseRate = LANDED_RATE[dGsm];
+            if (baseRate) cost = (val / 1000) * Math.max((baseRate[dSize] || 0) - 10, 0);
         } else if (type.indexOf('walk-') === 0) {
-            cost = getWalkCost(type, gsm, size, val);
+            cost = getWalkCost(type, dGsm, dSize, val);
         } else if (DIST_TIER_MAP[type]) {
-            // Tier-based distribution (HDB, Estate, Tong, Butong, Letterbox, Landed, Industrial)
-            cost = getDistCost(type, gsm, size, val);
+            cost = getDistCost(type, dGsm, dSize, val);
         }
 
         if (cost > 0) {
