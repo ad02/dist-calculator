@@ -206,7 +206,8 @@
                 <div class="item-row"><label>Express HDB Add-on</label><input type="number" class="d-val" data-type="express-hdb" oninput="update()"></div>
                 <div class="item-row"><label>Additional Landmark</label><input type="number" class="d-val" data-type="landmark" oninput="update()"></div>
                 <div class="item-row"><label>Solo Flyer</label><input type="number" class="d-val" data-type="solo" oninput="update()"></div>
-                <div class="item-row"><label>Multiple Flyer per Unit</label><input type="number" class="d-val" data-type="multi" oninput="update()"></div>
+                <div class="item-row"><label>Multiple Flyer per Unit (# designs)</label><input type="number" id="hdbMultiCount" min="0" max="10" placeholder="# of designs" oninput="updateMultiDesigns('hdb')"></div>
+                <div id="hdbMultiRows" style="padding:0 15px;"></div>
             </div>
 
             <div class="row-split">
@@ -216,7 +217,8 @@
                     <div class="item-row"><label>Express Add-on</label><input type="number" class="d-val" data-type="express-landed" oninput="update()"></div>
                     <div class="item-row"><label>Additional Landmark</label><input type="number" class="d-val" data-type="landed-landmark" oninput="update()"></div>
                     <div class="item-row"><label>Solo Flyer</label><input type="number" class="d-val" data-type="landed-solo" oninput="update()"></div>
-                    <div class="item-row"><label>Multiple per Unit</label><input type="number" class="d-val" data-type="landed-multi" oninput="update()"></div>
+                    <div class="item-row"><label>Multiple per Unit (# designs)</label><input type="number" id="landedMultiCount" min="0" max="10" placeholder="# of designs" oninput="updateMultiDesigns('landed')"></div>
+                    <div id="landedMultiRows" style="padding:0 15px;"></div>
                 </div>
                 <div class="card">
                     <div class="item-row" style="background:var(--navy); color:white; font-weight:700; font-size:11px;">INDUSTRIAL</div>
@@ -224,7 +226,8 @@
                     <div class="item-row"><label>Express Add-on</label><input type="number" class="d-val" data-type="express-industrial" oninput="update()"></div>
                     <div class="item-row"><label>Additional Landmark</label><input type="number" class="d-val" data-type="ind-landmark" oninput="update()"></div>
                     <div class="item-row"><label>Solo Flyer</label><input type="number" class="d-val" data-type="ind-solo" oninput="update()"></div>
-                    <div class="item-row"><label>Multiple per Unit</label><input type="number" class="d-val" data-type="ind-multi" oninput="update()"></div>
+                    <div class="item-row"><label>Multiple per Unit (# designs)</label><input type="number" id="indMultiCount" min="0" max="10" placeholder="# of designs" oninput="updateMultiDesigns('ind')"></div>
+                    <div id="indMultiRows" style="padding:0 15px;"></div>
                 </div>
             </div>
 
@@ -315,7 +318,8 @@ var HDB_BUTONG={
 };
 var HDB_BUTONG_RATE={"128":{A5:149,A4:157,A3:177},"157":{A5:151,A4:162,A3:182},"260":{A5:155,A4:177,A3:207}};
 
-var SOLELY={"128":{A5:15,A4:30},"157":{A5:17,A4:32},"260":{A5:21,A4:36}};
+// Solo Flyer: flat rate per GSM, size-independent (Hybrid behavior)
+var SOLELY={"128":{A5:15,A4:15,A3:15},"157":{A5:17,A4:17,A3:17},"260":{A5:21,A4:21,A3:21}};
 
 var LANDED={
 "128":[[1000,189,194,229],[2000,213,223,293],[3000,258,284,393],[4000,284,304,444]],
@@ -511,11 +515,6 @@ function update() {
         } else if (type === 'solo' || type === 'landed-solo' || type === 'ind-solo') {
             var s = SOLELY[dGsm];
             if (s) cost = (val / 1000) * (s[dSize] || 0);
-        } else if (type === 'multi' || type === 'landed-multi' || type === 'ind-multi') {
-            var baseRate;
-            if (type === 'multi') baseRate = HDB_STD_RATE[dGsm];
-            else baseRate = LANDED_RATE[dGsm];
-            if (baseRate) cost = (val / 1000) * Math.max((baseRate[dSize] || 0) - 10, 0);
         } else if (type.indexOf('walk-') === 0) {
             cost = getWalkCost(type, dGsm, dSize, val);
         } else if (DIST_TIER_MAP[type]) {
@@ -526,6 +525,74 @@ function update() {
             cost = Math.round(cost * 100) / 100;
             dTotal += cost;
             dH += '<div class="summary-line"><span>' + label + ' x' + val.toLocaleString() + '</span><b>$' + cost.toFixed(2) + '</b></div>';
+            hasD = true;
+        }
+    });
+
+    // Multiple Flyer per Unit (HDB, Landed, Industrial) - uses Distribution Only logic
+    [
+        {section:'hdb', countId:'hdbMultiCount', label:'HDB Multi-Flyer', tiers:HDB_STD, rates:HDB_STD_RATE},
+        {section:'landed', countId:'landedMultiCount', label:'Landed Multi-Flyer', tiers:LANDED, rates:LANDED_RATE},
+        {section:'ind', countId:'indMultiCount', label:'Industrial Multi-Flyer', tiers:LANDED, rates:LANDED_RATE}
+    ].forEach(function(cfg) {
+        var count = parseInt(document.getElementById(cfg.countId).value) || 0;
+        if (count <= 0) return;
+        var designs = [];
+        for (var d = 0; d < count; d++) {
+            var ds = document.getElementById(cfg.section + 'MultiSize' + d);
+            var dg = document.getElementById(cfg.section + 'MultiGsm' + d);
+            var dq = document.getElementById(cfg.section + 'MultiQty' + d);
+            if (ds && dg && dq) {
+                designs.push({size:ds.value, gsm:dg.value, qty:parseFloat(dq.value) || 0});
+            }
+        }
+        // Use highest GSM across designs
+        var gsmOrder = {'128':1,'157':2,'260':3};
+        var highestGsm = '128';
+        designs.forEach(function(d) {
+            if ((gsmOrder[d.gsm]||0) > (gsmOrder[highestGsm]||0)) highestGsm = d.gsm;
+        });
+        var rates = cfg.rates[highestGsm];
+        var tiers = cfg.tiers[highestGsm];
+        if (!rates) return;
+        // Split designs: <3K uses tier pricing, >=3K uses per-1K rate
+        var tierGroup = [], rateGroup = [];
+        designs.forEach(function(d) {
+            if (d.qty > 0) {
+                if (d.qty >= 3000 || !tiers) rateGroup.push(d);
+                else tierGroup.push(d);
+            }
+        });
+        var multiCost = 0;
+        // Tier group: combine quantities, single tier lookup, tagalong, MOQ
+        if (tierGroup.length > 0) {
+            var combinedQty = 0, maxSizeIdx = 0;
+            tierGroup.forEach(function(d) {
+                combinedQty += d.qty;
+                var si = {A5:1, A4:2, A3:3}[d.size] || 1;
+                if (si > maxSizeIdx) maxSizeIdx = si;
+            });
+            var p = prorate(tiers, combinedQty, maxSizeIdx);
+            if (p !== null) {
+                var tierCost = p;
+                if (tierGroup.length > 1) tierCost -= 10;
+                var moq = tiers[0][maxSizeIdx];
+                if (tierCost < moq) tierCost = moq;
+                multiCost += tierCost;
+            }
+        }
+        // Rate group: per-1K with tagalong discount
+        rateGroup.forEach(function(d, rIdx) {
+            var fullRate = rates[d.size] || 0;
+            var isTagalong = rIdx > 0 && rateGroup[0].qty >= 5000;
+            var rate = isTagalong ? fullRate - 10 : fullRate;
+            multiCost += (d.qty / 1000) * rate;
+        });
+        if (multiCost > 0) {
+            multiCost = Math.round(multiCost * 100) / 100;
+            dTotal += multiCost;
+            var designSummary = designs.filter(function(d){return d.qty>0;}).map(function(d){return d.size+'/'+d.gsm+' x'+d.qty.toLocaleString();}).join(', ');
+            dH += '<div class="summary-line"><span>' + cfg.label + ' (' + designSummary + ')</span><b>$' + multiCost.toFixed(2) + '</b></div>';
             hasD = true;
         }
     });
@@ -543,10 +610,34 @@ function update() {
     document.getElementById('sumGrand').textContent = '$' + grand.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
 
+function updateMultiDesigns(section) {
+    var count = parseInt(document.getElementById(section + 'MultiCount').value) || 0;
+    if (count > 10) count = 10;
+    var container = document.getElementById(section + 'MultiRows');
+    var html = '';
+    for (var d = 0; d < count; d++) {
+        html += '<div style="display:flex; gap:8px; align-items:center; padding:4px 0; border-bottom:1px solid #f1f5f9;">';
+        html += '<span style="font-size:11px; font-weight:600; color:var(--navy); min-width:60px;">#' + (d+1) + '</span>';
+        html += '<select id="' + section + 'MultiSize' + d + '" onchange="update()" style="width:auto;">';
+        html += '<option value="A5">A5</option><option value="A4" selected>A4</option><option value="A3">A3</option>';
+        html += '</select>';
+        html += '<select id="' + section + 'MultiGsm' + d + '" onchange="update()" style="width:auto;">';
+        html += '<option value="128">128gsm</option><option value="157">157gsm</option><option value="260">260gsm</option>';
+        html += '</select>';
+        html += '<input type="number" id="' + section + 'MultiQty' + d + '" placeholder="Qty" oninput="update()" style="width:100px;">';
+        html += '</div>';
+    }
+    container.innerHTML = html;
+    update();
+}
+
 function resetAll() {
     document.querySelectorAll('input[type="number"]').forEach(function(i) { i.value = ''; });
     document.querySelectorAll('select').forEach(function(s) { s.selectedIndex = 0; });
     document.getElementById('delToggle').checked = false;
+    document.getElementById('hdbMultiRows').innerHTML = '';
+    document.getElementById('landedMultiRows').innerHTML = '';
+    document.getElementById('indMultiRows').innerHTML = '';
     update();
 }
 
