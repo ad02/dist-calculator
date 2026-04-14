@@ -149,10 +149,14 @@ td:first-child{font-weight:500;color:var(--pri)}
 <div class="design-rows" id="multiDesignRows"></div>
 </div>
 
-<div class="pickup-box">
+<div class="pickup-box" style="flex-wrap:wrap;">
 <input type="checkbox" id="pickupCheck" onchange="calcQuote()"/>
-<label for="pickupCheck">Require Pick Up Services?</label>
-<span class="fee">(Flat fee of $20.00)</span>
+<label for="pickupCheck">Require Delivery Service?</label>
+<span class="fee">(Min $30 for 1-10 cartons, +$10 per additional 10 cartons)</span>
+<div id="pickupCartonWrap" style="display:none; width:100%; margin-top:8px; gap:8px; align-items:center;">
+<label style="font-size:13px; font-weight:500;">Cartons:</label>
+<input type="number" id="pickupCartons" min="0" step="1" placeholder="# of cartons" oninput="calcQuote()" style="width:150px;">
+</div>
 </div>
 
 <div class="grand-total">
@@ -271,7 +275,11 @@ Object.keys(HDB_STD_RATE).forEach(function(gsm){
 var EXPRESS_RATE={hdb:20,landed:40,industrial:40,letterbox:20};
 var EXPRESS_MIN=150;
 var LANDMARK_RATE=40;
-var PICKUP_FEE=20;
+// Delivery: tiered by cartons. Min $30 (1-10), +$10 per additional 10 cartons
+function getDeliveryFee(cartons){
+    if(cartons<=0) return 0;
+    return Math.ceil(cartons/10)*10+20;
+}
 
 // ========= TABLE BUILDERS =========
 
@@ -611,7 +619,14 @@ function calcQuote(){
         }
     }
 
-    var pickup=document.getElementById('pickupCheck').checked?PICKUP_FEE:0;
+    // Delivery: tiered by cartons
+    var delChecked=document.getElementById('pickupCheck').checked;
+    document.getElementById('pickupCartonWrap').style.display=delChecked?'flex':'none';
+    var pickup=0;
+    if(delChecked){
+        var cartons=parseInt(document.getElementById('pickupCartons').value)||0;
+        pickup=getDeliveryFee(cartons);
+    }
     var grand=distCost+expressCost+landmarkCost+soloCost+multiCost+pickup;
     grand=Math.round(grand*100)/100;
     document.getElementById('grandTotal').textContent='$'+grand.toFixed(2);

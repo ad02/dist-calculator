@@ -257,9 +257,16 @@
             </div>
         </div>
 
-        <div class="delivery-sidebar-card">
-            <label style="font-size: 11px; font-weight: 800; color: white; letter-spacing: 0.5px;">DELIVERY SERVICE?</label>
-            <input type="checkbox" id="delToggle" onchange="update()">
+        <div class="delivery-sidebar-card" style="flex-direction:column; gap:8px; align-items:stretch;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="font-size: 11px; font-weight: 800; color: white; letter-spacing: 0.5px;">DELIVERY SERVICE?</label>
+                <input type="checkbox" id="delToggle" onchange="update()">
+            </div>
+            <div id="delCartonWrap" style="display:none; gap:8px; align-items:center;">
+                <label style="font-size: 11px; color:white;">Cartons:</label>
+                <input type="number" id="delCartons" min="0" placeholder="# of cartons" oninput="update()" style="flex:1;">
+            </div>
+            <div style="font-size:10px; color:#94a3b8;">Min $30 (1-10 cartons), +$10 per additional 10</div>
         </div>
     </div>
 </div>
@@ -384,7 +391,12 @@ var WALK_MAP={
 var EXPRESS_RATE_PER_K={hdb:20,landed:40,industrial:40};
 var EXPRESS_MIN=150;
 var LANDMARK_RATE=40;
-var DELIVERY_FEE=20;
+
+// Delivery: tiered by cartons. Min $30 (1-10), +$10 per additional 10 cartons
+function getDeliveryFee(cartons) {
+    if (cartons <= 0) return 0;
+    return Math.ceil(cartons / 10) * 10 + 20;
+}
 
 // ========= PRINTING: next tier UP (no proration) =========
 function getPrintCost(size, gsm, side, qty) {
@@ -597,11 +609,17 @@ function update() {
         }
     });
 
-    // Delivery
-    if (document.getElementById('delToggle').checked) {
-        dTotal += DELIVERY_FEE;
-        dH += '<div class="summary-line"><span>Delivery Service</span><b>$' + DELIVERY_FEE.toFixed(2) + '</b></div>';
-        hasD = true;
+    // Delivery (tiered by cartons: min $30, +$10 per 10 cartons)
+    var delChecked = document.getElementById('delToggle').checked;
+    document.getElementById('delCartonWrap').style.display = delChecked ? 'flex' : 'none';
+    if (delChecked) {
+        var cartons = parseInt(document.getElementById('delCartons').value) || 0;
+        if (cartons > 0) {
+            var delFee = getDeliveryFee(cartons);
+            dTotal += delFee;
+            dH += '<div class="summary-line"><span>Delivery (' + cartons + ' carton' + (cartons>1?'s':'') + ')</span><b>$' + delFee.toFixed(2) + '</b></div>';
+            hasD = true;
+        }
     }
 
     document.getElementById('pBreak').innerHTML = hasP ? pH : '';
