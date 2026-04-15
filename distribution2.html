@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distribution Quotation Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1e40af;
+    --primary-dark: #1e3a8a;
+    --primary-light: #dbeafe;
+    --accent: #10b981;
+    --accent-dark: #059669;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-soft: #f8fafc;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.page {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+}
+
+.page-header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 4px;
+    margin-bottom: -4px;
+}
+.page-title { font-size: 22px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.2px; }
+.page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.btn {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+}
+.btn-reset { background: white; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-reset:hover { background: var(--bg-soft); color: var(--text); }
+
+.card {
+    background: var(--bg-card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.04);
+}
+.card-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card-num {
+    display: inline-flex;
+    width: 24px; height: 24px;
+    background: var(--primary);
+    color: white;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+.card-title { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; }
+.card-hint { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.card-body { padding: 20px; }
+
+label.fld-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 6px;
+}
+input[type="number"], select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+input[type="number"] { font-weight: 600; }
+input[type="number"]:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30,64,175,.1);
+}
+select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%2364748b'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+/* Tabs */
+.tabs-bar {
+    display: flex;
+    gap: 2px;
+    padding: 6px;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+}
+.tab {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+    text-align: center;
+}
+.tab:hover { color: var(--text); background: white; }
+.tab.active { background: var(--primary); color: white; box-shadow: 0 1px 3px rgba(30,64,175,.3); }
+.tab-panel { display: none; padding: 20px; }
+.tab-panel.active { display: block; }
+
+/* Sub-tabs (pills) */
+.sub-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+.sub-pill {
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+}
+.sub-pill:hover { background: white; color: var(--text); }
+.sub-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Prominent Size/GSM bar */
+.size-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 2px solid #f59e0b;
+    border-radius: 10px;
+    margin: 16px 0;
+    position: relative;
+}
+.size-bar::before {
+    content: "⚡ Flyer Size & Paper GSM";
+    position: absolute;
+    top: -11px;
+    left: 16px;
+    background: #f59e0b;
+    color: white;
+    padding: 3px 12px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+}
+.size-bar .fld-label { color: #78350f; font-weight: 800; }
+.size-bar select { border-color: #f59e0b; font-weight: 700; }
+
+/* Pricing reference table */
+.ref-wrap { margin-top: 16px; }
+.ref-toggle {
+    background: none;
+    border: 1px dashed var(--border);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+}
+.ref-toggle:hover { background: var(--bg-soft); }
+.ref-tables {
+    margin-top: 12px;
+    display: none;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.ref-tables.open { display: block; }
+.ref-tables table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.ref-tables th {
+    background: #334155;
+    color: white;
+    padding: 8px 10px;
+    font-weight: 600;
+    text-align: center;
+}
+.ref-tables th:first-child { text-align: left; }
+.ref-tables td {
+    padding: 7px 10px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+}
+.ref-tables td:first-child { text-align: left; background: var(--bg-soft); color: var(--text-muted); font-weight: 600; }
+
+/* Calc result */
+.calc-inputs {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 14px;
+    align-items: end;
+    margin-bottom: 16px;
+}
+.result-box {
+    padding: 16px 20px;
+    background: var(--primary-light);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.result-box-label { font-size: 13px; font-weight: 700; color: var(--primary); }
+.result-box-value { font-size: 26px; font-weight: 800; color: var(--primary); }
+
+/* Service rows */
+.service-row {
+    display: grid;
+    grid-template-columns: 1fr 130px;
+    gap: 14px;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.service-row:last-child { border-bottom: none; }
+.service-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.service-hint { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* Multi-flyer rows */
+.multi-head {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 10px;
+}
+.multi-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    align-items: center;
+}
+.multi-row:last-child { border-bottom: none; }
+.multi-num { font-size: 11px; font-weight: 700; color: var(--primary); }
+
+/* Delivery */
+.delivery-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+.delivery-toggle label {
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+.delivery-cartons {
+    margin-top: 14px;
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: end;
+}
+.delivery-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 10px 12px;
+    background: var(--bg-soft);
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+/* Sidebar */
+.sidebar { position: sticky; top: 24px; }
+.summary-card {
+    background: var(--primary-dark);
+    color: white;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 6px 24px rgba(30,58,138,.2);
+}
+.summary-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #93c5fd;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.sum-section { margin-bottom: 16px; }
+.sum-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+}
+.sum-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: #cbd5e1;
+    padding: 3px 0;
+}
+.sum-line span { flex: 1; }
+.sum-line b { color: white; font-weight: 600; white-space: nowrap; }
+.sum-empty {
+    font-size: 12px;
+    color: #64748b;
+    font-style: italic;
+    padding: 4px 0;
+}
+.grand-total-box {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 2px solid rgba(255,255,255,.15);
+    text-align: center;
+}
+.grand-total-label { font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 1.5px; }
+.grand-total-value {
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    margin-top: 4px;
+    letter-spacing: -1px;
+}
+
+.check {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+@media (max-width: 1100px) {
+    .page { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .calc-inputs { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Distribution Quotation Calculator</div>
+            <div class="page-subtitle">Pick a service → enter quantity → get your quote</div>
+        </div>
+        <button class="btn btn-reset" onclick="resetAll()">Reset All</button>
+    </div>
+
+    <div>
+        <!-- 1. Service Type -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">1</span>Distribution Service</div>
+                <div class="card-hint">Tier-based with proration</div>
+            </div>
+            <div class="tabs-bar">
+                <button class="tab active" data-tab="hdb" onclick="switchService('hdb')">HDB Door-to-Door</button>
+                <button class="tab" data-tab="letterbox" onclick="switchService('letterbox')">HDB Letterbox</button>
+                <button class="tab" data-tab="landed" onclick="switchService('landed')">Landed</button>
+                <button class="tab" data-tab="industrial" onclick="switchService('industrial')">Industrial</button>
+                <button class="tab" data-tab="walkway" onclick="switchService('walkway')">Walkway</button>
+            </div>
+
+            <div class="card-body">
+                <!-- HDB sub-type pills -->
+                <div id="hdbSubWrap">
+                    <div class="fld-label" style="margin-bottom:8px;">HDB Service Type</div>
+                    <div class="sub-pills" id="hdbPills">
+                        <button class="sub-pill active" data-sub="standard" onclick="switchHdbSub('standard')">Standard</button>
+                        <button class="sub-pill" data-sub="estate" onclick="switchHdbSub('estate')">Selected Estate</button>
+                        <button class="sub-pill" data-sub="tong" onclick="switchHdbSub('tong')">Selected Blocks (通)</button>
+                        <button class="sub-pill" data-sub="butong" onclick="switchHdbSub('butong')">Selected Blocks (不通)</button>
+                    </div>
+                </div>
+
+                <!-- Walkway sub-type pills -->
+                <div id="walkSubWrap" style="display:none;">
+                    <div class="fld-label" style="margin-bottom:8px;">Walkway Service Type</div>
+                    <div class="sub-pills" id="walkPills">
+                        <button class="sub-pill active" data-sub="standard" onclick="switchWalkSub('standard')">Standard</button>
+                        <button class="sub-pill" data-sub="express" onclick="switchWalkSub('express')">Express/Selected Date</button>
+                        <button class="sub-pill" data-sub="remote" onclick="switchWalkSub('remote')">Remote Area</button>
+                        <button class="sub-pill" data-sub="remoteexp" onclick="switchWalkSub('remoteexp')">Remote Area Express</button>
+                    </div>
+                </div>
+
+                <!-- Size + GSM -->
+                <div class="size-bar">
+                    <div>
+                        <label class="fld-label">Flyer Size</label>
+                        <select id="calcSize" onchange="update()">
+                            <option value="A5">A5</option>
+                            <option value="A4">A4</option>
+                            <option value="A3">A3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="fld-label">Paper GSM</label>
+                        <select id="calcGsm" onchange="update()">
+                            <option value="128" selected>128gsm or below</option>
+                            <option value="157">157gsm or below</option>
+                            <option value="260">260gsm or below</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Reference tables -->
+                <div class="ref-wrap">
+                    <button type="button" class="ref-toggle" onclick="toggleRef()">
+                        <span id="refToggleIcon">+</span> Show pricing reference table
+                    </button>
+                    <div class="ref-tables" id="refTables"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Quantity & Cost -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">2</span>Enter Quantity</div>
+                <div class="card-hint" id="qtyHint">Proration between tiers</div>
+            </div>
+            <div class="card-body">
+                <div class="calc-inputs">
+                    <div>
+                        <label class="fld-label" id="qtyLabel">Quantity</label>
+                        <input type="number" id="calcQty" placeholder="e.g. 5000" oninput="update()">
+                    </div>
+                    <div class="result-box">
+                        <span class="result-box-label">Estimated Distribution Cost</span>
+                        <span id="estCost" class="result-box-value">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Add-on Surcharges -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">3</span>Add-on Surcharges</div>
+                <div class="card-hint">Optional extras</div>
+            </div>
+            <div class="card-body">
+                <div class="service-row"><div><div class="service-label">Express Services</div><div class="service-hint">Min $150, per-1K rate by service type</div></div><input type="number" id="addonExpress" placeholder="Qty" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Additional Landmark</div><div class="service-hint">$40 per landmark</div></div><input type="number" id="addonLandmark" placeholder="# landmarks" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Solo Flyer</div><div class="service-hint">Flat rate by GSM ($15 / $17 / $21)</div></div><input type="number" id="addonSolo" placeholder="Qty" oninput="update()"></div>
+                <div style="padding:14px 0 4px;">
+                    <div class="multi-head">Multiple Flyer per Unit</div>
+                    <input type="number" id="addonMultiCount" min="0" max="10" placeholder="Number of designs (0-10)" oninput="updateMultiDesigns()" style="max-width:280px;">
+                    <div id="multiDesignRows" style="margin-top:10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Delivery -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">4</span>Delivery Service</div>
+                <div class="card-hint">Min $30, +$10 per 10 cartons</div>
+            </div>
+            <div class="card-body">
+                <div class="delivery-toggle" onclick="var c=document.getElementById('delToggle'); c.checked=!c.checked; update();">
+                    <label>Require delivery?</label>
+                    <input type="checkbox" id="delToggle" class="check" onchange="update()" onclick="event.stopPropagation();">
+                </div>
+                <div id="delCartonWrap" class="delivery-cartons">
+                    <div>
+                        <label class="fld-label">Number of Cartons</label>
+                        <input type="number" id="delCartons" min="0" placeholder="e.g. 5" oninput="update()">
+                    </div>
+                    <div>
+                        <label class="fld-label">Fee</label>
+                        <div style="padding:10px 12px; background:var(--bg-soft); border-radius:8px; font-weight:700; color:var(--primary-dark);"><span id="delFeeDisplay">$0.00</span></div>
+                    </div>
+                </div>
+                <div class="delivery-hint">1-10 cartons = $30 · 11-20 = $40 · 21-30 = $50 · +$10 per additional 10</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="summary-card">
+            <div class="summary-title">Quotation Summary</div>
+            <div id="distBreak" class="sum-section"></div>
+            <div id="addonBreak" class="sum-section"></div>
+            <div id="delBreak" class="sum-section"></div>
+            <div id="emptyMsg" class="sum-empty">Enter values to see your quote breakdown…</div>
+            <div class="grand-total-box">
+                <span class="grand-total-label">GRAND TOTAL</span>
+                <span class="grand-total-value" id="sumGrand">$0.00</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========= DISTRIBUTION DATA =========
+var HDB_STD={
+"128":[[1000,149,155,175],[2000,177,189,229],[3000,194,212,272],[4000,212,236,316],[5000,240,270,370],[6000,288,324,444],[7000,301,343,483],[8000,344,392,552],[9000,360,418,594],[10000,380,440,640]],
+"157":[[1000,151,160,185],[2000,181,199,233],[3000,200,227,292],[4000,230,266,341],[5000,250,295,400],[6000,300,354,479],[7000,315,378,523],[8000,348,432,597],[9000,372,459,644],[10000,400,490,690]],
+"260":[[1000,155,175,215],[2000,189,259,309],[3000,212,272,392],[4000,236,316,476],[5000,270,370,570],[6000,324,396,684],[7000,343,483,763],[8000,392,552,872],[9000,418,594,954],[10000,440,640,1040]]
+};
+var HDB_STD_RATE={"128":{A5:38,A4:44,A3:64},"157":{A5:40,A4:49,A3:69},"260":{A5:44,A4:64,A3:104}};
+
+var HDB_ESTATE={
+"128":[[1000,151,157,177],[2000,218,230,270],[3000,297,315,375],[4000,316,340,420]],
+"157":[[1000,153,160,185],[2000,222,240,280],[3000,303,330,390],[4000,324,360,440]],
+"260":[[1000,157,177,215],[2000,230,270,350],[3000,315,375,495],[4000,340,420,540]]
+};
+var HDB_ESTATE_RATE={"128":{A5:79,A4:85,A3:105},"157":{A5:81,A4:90,A3:110},"260":{A5:85,A4:105,A3:135}};
+
+var HDB_TONG={
+"128":[[1000,179,182,202],[2000,278,294,334],[3000,387,411,471],[4000,436,468,548]],
+"157":[[1000,181,187,207],[2000,282,304,344],[3000,393,426,486],[4000,444,488,568]],
+"260":[[1000,185,202,242],[2000,290,334,414],[3000,405,471,591],[4000,460,548,668]]
+};
+var HDB_TONG_RATE={"128":{A5:109,A4:117,A3:137},"157":{A5:111,A4:122,A3:142},"260":{A5:115,A4:137,A3:167}};
+
+var HDB_BUTONG={
+"128":[[1000,219,227,247],[2000,359,375,415],[3000,507,531,591],[4000,596,628,708]],
+"157":[[1000,221,232,252],[2000,363,385,425],[3000,513,546,606],[4000,604,648,728]],
+"260":[[1000,225,247,287],[2000,371,415,495],[3000,525,591,711],[4000,620,708,828]]
+};
+var HDB_BUTONG_RATE={"128":{A5:149,A4:157,A3:177},"157":{A5:151,A4:162,A3:182},"260":{A5:155,A4:177,A3:207}};
+
+// Solo Flyer rates per 1,000 (matches original Distribution Only)
+var SOLELY={"128":{A5:15,A4:30},"157":{A5:17,A4:32},"260":{A5:21,A4:36}};
+
+var LANDED={
+"128":[[1000,189,194,229],[2000,213,223,293],[3000,258,284,393],[4000,284,304,444]],
+"157":[[1000,192,219,234],[2000,219,253,298],[3000,282,323,398],[4000,296,364,464]],
+"260":[[1000,194,229,309],[2000,223,293,453],[3000,284,393,633],[4000,304,444,764]]
+};
+var LANDED_RATE={"128":{A5:71,A4:76,A3:111},"157":{A5:74,A4:91,A3:116},"260":{A5:76,A4:111,A3:191}};
+
+// HDB Letterbox: HDB Standard minus $2 per 1K qty
+var HDB_LB={};
+Object.keys(HDB_STD).forEach(function(g){HDB_LB[g]=HDB_STD[g].map(function(r){var d=(r[0]/1000)*2;return [r[0],r[1]-d,r[2]-d,r[3]-d];});});
+var HDB_LB_RATE={};
+Object.keys(HDB_STD_RATE).forEach(function(g){var r=HDB_STD_RATE[g];HDB_LB_RATE[g]={A5:r.A5-2,A4:r.A4-2,A3:r.A3-2};});
+
+// Walkway
+var WALK_STD={
+"128":[[1,142,147,182],[2,178,188,258],[3,252,278,387],[4,276,296,436]],
+"157":[[1,145,172,187],[2,184,218,263],[3,276,317,392],[4,288,356,456]],
+"260":[[1,147,182,262],[2,188,258,418],[3,278,387,627],[4,296,436,756]]
+};
+var WALK_STD_RATE={"128":{A5:69,A4:74,A3:109},"157":{A5:72,A4:89,A3:114},"260":{A5:74,A4:109,A3:189}};
+var WALK_REMOTE={
+"128":[[1,172,177,212],[2,238,248,318],[3,342,357,477],[4,396,416,556]],
+"157":[[1,175,202,217],[2,244,278,323],[3,351,369,482],[4,408,476,576]],
+"260":[[1,177,212,292],[2,248,318,478],[3,368,466,717],[4,416,556,876]]
+};
+var WALK_REMOTE_RATE={"128":{A5:99,A4:104,A3:139},"157":{A5:102,A4:119,A3:144},"260":{A5:104,A4:139,A3:219}};
+var WALK_EXP={
+"128":[[1,207,212,247],[2,309,318,388],[3,447,473,582],[4,536,556,696]],
+"157":[[1,210,237,252],[2,315,348,393],[3,456,512,587],[4,548,616,716]],
+"260":[[1,212,247,327],[2,319,388,548],[3,473,582,822],[4,556,696,1016]]
+};
+var WALK_EXP_RATE={"128":{A5:134,A4:139,A3:174},"157":{A5:137,A4:154,A3:179},"260":{A5:139,A4:174,A3:254}};
+var WALK_EXPR={
+"128":[[1,237,242,277],[2,369,379,449],[3,537,552,672],[4,656,676,816]],
+"157":[[1,240,267,282],[2,375,409,454],[3,546,591,677],[4,668,736,836]],
+"260":[[1,242,277,357],[2,379,449,609],[3,563,661,912],[4,676,816,1136]]
+};
+var WALK_EXPR_RATE={"128":{A5:164,A4:169,A3:204},"157":{A5:167,A4:184,A3:209},"260":{A5:169,A4:204,A3:284}};
+
+var EXPRESS_RATE={hdb:20,landed:40,industrial:40,letterbox:20};
+var EXPRESS_MIN=150;
+var LANDMARK_RATE=40;
+
+function getDeliveryFee(c){if(c<=0)return 0;return Math.ceil(c/10)*10+20;}
+
+function prorate(tiers,qty,sizeIdx){
+    if(!tiers||!tiers.length)return 0;
+    for(var i=0;i<tiers.length;i++){
+        if(qty===tiers[i][0])return tiers[i][sizeIdx];
+        if(qty<tiers[i][0]){
+            if(i===0){var calc=tiers[0][sizeIdx]*(qty/tiers[0][0]);return Math.min(calc,tiers[0][sizeIdx]);}
+            var unitRate=tiers[i-1][sizeIdx]/tiers[i-1][0];
+            var calc=unitRate*qty;
+            return Math.min(calc,tiers[i][sizeIdx]);
+        }
+    }
+    return null;
+}
+
+// State
+var currentService = 'hdb';
+var currentHdbSub = 'standard';
+var currentWalkSub = 'standard';
+
+function getServiceTiersAndRate(){
+    if(currentService==='hdb'){
+        if(currentHdbSub==='standard') return {tiers:HDB_STD, rate:HDB_STD_RATE, max:10000};
+        if(currentHdbSub==='estate') return {tiers:HDB_ESTATE, rate:HDB_ESTATE_RATE, max:4000};
+        if(currentHdbSub==='tong') return {tiers:HDB_TONG, rate:HDB_TONG_RATE, max:4000};
+        if(currentHdbSub==='butong') return {tiers:HDB_BUTONG, rate:HDB_BUTONG_RATE, max:4000};
+    }
+    if(currentService==='letterbox') return {tiers:HDB_LB, rate:HDB_LB_RATE, max:10000};
+    if(currentService==='landed'||currentService==='industrial') return {tiers:LANDED, rate:LANDED_RATE, max:4000};
+    if(currentService==='walkway'){
+        if(currentWalkSub==='standard') return {tiers:WALK_STD, rate:WALK_STD_RATE, walkway:true};
+        if(currentWalkSub==='express') return {tiers:WALK_EXP, rate:WALK_EXP_RATE, walkway:true};
+        if(currentWalkSub==='remote') return {tiers:WALK_REMOTE, rate:WALK_REMOTE_RATE, walkway:true};
+        return {tiers:WALK_EXPR, rate:WALK_EXPR_RATE, walkway:true};
+    }
+    return null;
+}
+
+function getServiceLabel(){
+    if(currentService==='hdb'){
+        var subLabel={standard:'Standard',estate:'Selected Estate',tong:'Selected Blocks (通)',butong:'Selected Blocks (不通)'}[currentHdbSub];
+        return 'HDB Door-to-Door — '+subLabel;
+    }
+    if(currentService==='letterbox') return 'HDB Letterbox';
+    if(currentService==='landed') return 'Landed Property';
+    if(currentService==='industrial') return 'Industrial Letterbox';
+    if(currentService==='walkway'){
+        var subLabel={standard:'Standard',express:'Express/Selected Date',remote:'Remote Area',remoteexp:'Remote Area Express'}[currentWalkSub];
+        return 'Walkway — '+subLabel;
+    }
+    return '';
+}
+
+function switchService(name){
+    currentService = name;
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===name);});
+    document.getElementById('hdbSubWrap').style.display = (name==='hdb')?'block':'none';
+    document.getElementById('walkSubWrap').style.display = (name==='walkway')?'block':'none';
+    // Update qty label/placeholder for walkway (slots)
+    var qL = document.getElementById('qtyLabel');
+    var qI = document.getElementById('calcQty');
+    var qH = document.getElementById('qtyHint');
+    if(name==='walkway'){
+        qL.textContent='Slots';
+        qI.placeholder='e.g. 3';
+        qH.textContent='1-4 slot tier pricing, above 4 per-slot rate';
+    } else {
+        qL.textContent='Quantity';
+        qI.placeholder='e.g. 5000';
+        qH.textContent='Proration between tiers';
+    }
+    renderRefTable();
+    update();
+}
+
+function switchHdbSub(sub){
+    currentHdbSub = sub;
+    document.querySelectorAll('#hdbPills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.sub===sub);});
+    renderRefTable();
+    update();
+}
+
+function switchWalkSub(sub){
+    currentWalkSub = sub;
+    document.querySelectorAll('#walkPills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.sub===sub);});
+    renderRefTable();
+    update();
+}
+
+function toggleRef(){
+    var t = document.getElementById('refTables');
+    var i = document.getElementById('refToggleIcon');
+    var open = !t.classList.contains('open');
+    t.classList.toggle('open', open);
+    i.textContent = open ? '−' : '+';
+}
+
+function renderRefTable(){
+    var info = getServiceTiersAndRate();
+    if(!info){document.getElementById('refTables').innerHTML=''; return;}
+    var gsm = document.getElementById('calcGsm').value;
+    var tiers = info.tiers[gsm];
+    if(!tiers){document.getElementById('refTables').innerHTML=''; return;}
+    var qtyLabel = info.walkway ? 'Slots' : 'QTY';
+    var html = '<table><thead><tr><th>'+qtyLabel+'</th><th>A5</th><th>A4</th><th>A3</th></tr></thead><tbody>';
+    tiers.forEach(function(r){
+        html += '<tr><td>'+(info.walkway?r[0]:r[0].toLocaleString())+'</td><td>$'+Math.round(r[1]*100)/100+'</td><td>$'+Math.round(r[2]*100)/100+'</td><td>$'+Math.round(r[3]*100)/100+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    if(info.rate && info.rate[gsm]){
+        var r = info.rate[gsm];
+        var suffix = info.walkway ? '/slot above 4' : '/1,000 above max tier';
+        html += '<div style="padding:10px 14px; background:var(--bg-soft); font-size:11px; color:var(--text-muted); border-top:1px solid var(--border);">Above-tier rate — A5: $'+r.A5+suffix+' · A4: $'+r.A4+suffix+' · A3: $'+r.A3+suffix+'</div>';
+    }
+    document.getElementById('refTables').innerHTML = html;
+}
+
+function updateMultiDesigns(){
+    var count = parseInt(document.getElementById('addonMultiCount').value)||0;
+    if(count>10) count=10;
+    var container = document.getElementById('multiDesignRows');
+    var html='';
+    for(var d=0;d<count;d++){
+        html+='<div class="multi-row">';
+        html+='<div class="multi-num">#'+(d+1)+'</div>';
+        html+='<select id="multiSize'+d+'" onchange="update()"><option value="A5">A5</option><option value="A4" selected>A4</option><option value="A3">A3</option></select>';
+        html+='<select id="multiGsm'+d+'" onchange="update()"><option value="128">128gsm</option><option value="157">157gsm</option><option value="260">260gsm</option></select>';
+        html+='<input type="number" id="multiQty'+d+'" placeholder="Qty" oninput="update()">';
+        html+='</div>';
+    }
+    container.innerHTML=html;
+    update();
+}
+
+function update(){
+    var size = document.getElementById('calcSize').value;
+    var gsm = document.getElementById('calcGsm').value;
+    var qty = parseFloat(document.getElementById('calcQty').value)||0;
+    var sizeIdx = {A5:1,A4:2,A3:3}[size]||1;
+    var info = getServiceTiersAndRate();
+    var distCost = 0;
+
+    // Render reference table (re-render for gsm changes)
+    renderRefTable();
+
+    // Main distribution cost
+    if(info && qty > 0){
+        var tiers = info.tiers[gsm];
+        var rate = info.rate[gsm];
+        if(tiers && rate){
+            if(info.walkway){
+                // Walkway: exact slot match or above-4 extrapolation
+                var matched = false;
+                for(var i=0;i<tiers.length;i++){
+                    if(qty===tiers[i][0]){distCost=tiers[i][sizeIdx]; matched=true; break;}
+                }
+                if(!matched){
+                    if(qty>4){
+                        distCost = tiers[tiers.length-1][sizeIdx] + (qty-4)*(rate[size]||0);
+                    }
+                }
+            } else {
+                var p = prorate(tiers, qty, sizeIdx);
+                if(p !== null){
+                    distCost = p;
+                } else {
+                    // Above max tier
+                    var base = tiers[tiers.length-1][sizeIdx];
+                    distCost = base + ((qty - info.max)/1000)*(rate[size]||0);
+                }
+            }
+        }
+    }
+    distCost = Math.round(distCost*100)/100;
+    document.getElementById('estCost').textContent = '$'+distCost.toFixed(2);
+
+    // Summary state
+    var distH = '', addonH = '', delH = '';
+    var hasDist = false, hasAddon = false, hasDel = false;
+    var grandTotal = 0;
+
+    if(distCost > 0){
+        distH = '<div class="sum-section-title">Distribution</div>';
+        distH += '<div class="sum-line"><span>'+getServiceLabel()+'<br><span style="color:#94a3b8; font-size:10px;">'+size+' '+gsm+'gsm x'+qty.toLocaleString()+'</span></span><b>$'+distCost.toFixed(2)+'</b></div>';
+        grandTotal += distCost;
+        hasDist = true;
+    }
+
+    // Add-ons
+    var expressQty = parseFloat(document.getElementById('addonExpress').value)||0;
+    if(expressQty > 0){
+        var svc = currentService;
+        var expRate = EXPRESS_RATE[svc]||20;
+        var expCost = Math.max((expressQty/1000)*expRate, EXPRESS_MIN);
+        addonH += '<div class="sum-line"><span>Express Services x'+expressQty.toLocaleString()+'</span><b>$'+expCost.toFixed(2)+'</b></div>';
+        grandTotal += expCost;
+        hasAddon = true;
+    }
+
+    var landmarkQty = parseFloat(document.getElementById('addonLandmark').value)||0;
+    if(landmarkQty > 0){
+        var landCost = landmarkQty * LANDMARK_RATE;
+        addonH += '<div class="sum-line"><span>Additional Landmark x'+landmarkQty+'</span><b>$'+landCost.toFixed(2)+'</b></div>';
+        grandTotal += landCost;
+        hasAddon = true;
+    }
+
+    var soloQty = parseFloat(document.getElementById('addonSolo').value)||0;
+    if(soloQty > 0){
+        var s = SOLELY[gsm];
+        if(s){
+            var soloCost = (soloQty/1000)*(s[size]||0);
+            addonH += '<div class="sum-line"><span>Solo Flyer x'+soloQty.toLocaleString()+'</span><b>$'+soloCost.toFixed(2)+'</b></div>';
+            grandTotal += soloCost;
+            hasAddon = true;
+        }
+    }
+
+    // Multi-flyer
+    var multiCount = parseInt(document.getElementById('addonMultiCount').value)||0;
+    if(multiCount > 0){
+        var designs = [];
+        for(var d=0;d<multiCount;d++){
+            var ds=document.getElementById('multiSize'+d);
+            var dg=document.getElementById('multiGsm'+d);
+            var dq=document.getElementById('multiQty'+d);
+            if(ds&&dg&&dq) designs.push({size:ds.value, gsm:dg.value, qty:parseFloat(dq.value)||0});
+        }
+        var gsmOrder={'128':1,'157':2,'260':3};
+        var highestGsm='128';
+        designs.forEach(function(d){if((gsmOrder[d.gsm]||0)>(gsmOrder[highestGsm]||0)) highestGsm=d.gsm;});
+        // Use currently selected service for rates
+        var serviceInfo = getServiceTiersAndRate();
+        if(serviceInfo){
+            // For walkway, no tier table (designs use per-slot/per-1K rates only)
+            var tiers = serviceInfo.walkway ? null : serviceInfo.tiers[highestGsm];
+            var rates = serviceInfo.rate[highestGsm];
+            if(rates){
+                var tierGroup=[], rateGroup=[];
+                designs.forEach(function(d){if(d.qty>0){if(d.qty>=3000||!tiers) rateGroup.push(d); else tierGroup.push(d);}});
+                var multiCost=0;
+                if(tierGroup.length>0){
+                    var combinedQty=0, maxSizeIdx=0;
+                    tierGroup.forEach(function(d){combinedQty+=d.qty; var si={A5:1,A4:2,A3:3}[d.size]||1; if(si>maxSizeIdx) maxSizeIdx=si;});
+                    var p=prorate(tiers,combinedQty,maxSizeIdx);
+                    if(p!==null){
+                        var tc=p;
+                        if(tierGroup.length>1) tc-=10;
+                        var moq=tiers[0][maxSizeIdx];
+                        if(tc<moq) tc=moq;
+                        multiCost+=tc;
+                    }
+                }
+                rateGroup.forEach(function(d,rIdx){
+                    var fullRate=rates[d.size]||0;
+                    var isTag=rIdx>0&&rateGroup[0].qty>=5000;
+                    var rate=isTag?fullRate-10:fullRate;
+                    multiCost+=(d.qty/1000)*rate;
+                });
+                if(multiCost>0){
+                    multiCost=Math.round(multiCost*100)/100;
+                    addonH += '<div class="sum-line"><span>Multi-Flyer ('+multiCount+' designs)</span><b>$'+multiCost.toFixed(2)+'</b></div>';
+                    grandTotal += multiCost;
+                    hasAddon = true;
+                }
+            }
+        }
+    }
+
+    if(hasAddon) addonH = '<div class="sum-section-title">Add-on Surcharges</div>' + addonH;
+
+    // Delivery
+    var delChecked = document.getElementById('delToggle').checked;
+    document.getElementById('delCartonWrap').style.display = delChecked?'grid':'none';
+    if(delChecked){
+        var cartons = parseInt(document.getElementById('delCartons').value)||0;
+        var delFee = getDeliveryFee(cartons);
+        document.getElementById('delFeeDisplay').textContent = '$'+delFee.toFixed(2);
+        if(cartons > 0){
+            delH = '<div class="sum-section-title">Delivery</div>';
+            delH += '<div class="sum-line"><span>Delivery ('+cartons+' carton'+(cartons>1?'s':'')+')</span><b>$'+delFee.toFixed(2)+'</b></div>';
+            grandTotal += delFee;
+            hasDel = true;
+        }
+    }
+
+    document.getElementById('distBreak').innerHTML = hasDist ? distH : '';
+    document.getElementById('addonBreak').innerHTML = hasAddon ? addonH : '';
+    document.getElementById('delBreak').innerHTML = hasDel ? delH : '';
+    document.getElementById('emptyMsg').style.display = (hasDist||hasAddon||hasDel) ? 'none' : 'block';
+
+    grandTotal = Math.round(grandTotal*100)/100;
+    document.getElementById('sumGrand').textContent = '$'+grandTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function resetAll(){
+    document.querySelectorAll('input[type="number"]').forEach(function(i){i.value='';});
+    document.querySelectorAll('select').forEach(function(s){s.selectedIndex=0;});
+    document.getElementById('calcGsm').value='128';
+    document.getElementById('delToggle').checked=false;
+    document.getElementById('multiDesignRows').innerHTML='';
+    document.getElementById('refTables').classList.remove('open');
+    document.getElementById('refToggleIcon').textContent='+';
+    currentHdbSub='standard';
+    currentWalkSub='standard';
+    document.querySelectorAll('#hdbPills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.sub==='standard');});
+    document.querySelectorAll('#walkPills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.sub==='standard');});
+    switchService('hdb');
+}
+
+// Init
+renderRefTable();
+update();
+</script>
+
+</body>
+</html>
