@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hybrid Calculator v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1e40af;
+    --primary-dark: #1e3a8a;
+    --primary-light: #dbeafe;
+    --accent: #10b981;
+    --accent-dark: #059669;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-soft: #f8fafc;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.page {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+}
+
+/* Page header */
+.page-header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 4px;
+    margin-bottom: -4px;
+}
+.page-title { font-size: 22px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.2px; }
+.page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.btn {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+}
+.btn-reset { background: white; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-reset:hover { background: var(--bg-soft); color: var(--text); }
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.04);
+}
+.card-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card-head.clickable { cursor: pointer; user-select: none; }
+.card-head.clickable:hover { background: #f0f4fa; }
+.card-num {
+    display: inline-flex;
+    width: 24px; height: 24px;
+    background: var(--primary);
+    color: white;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+.card-title { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; }
+.card-hint { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.card-body { padding: 20px; }
+
+/* Inputs */
+label.fld-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 6px;
+}
+input[type="number"], select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+input[type="number"] { font-weight: 600; }
+input[type="number"]:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30,64,175,.1);
+}
+select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%2364748b'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+/* Printing layout */
+.print-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+.finishing-grid {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border);
+}
+.finishing-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 10px;
+}
+.finishing-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+/* Distribution tabs */
+.tabs-bar {
+    display: flex;
+    gap: 2px;
+    padding: 6px;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+}
+.tab {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+    text-align: center;
+}
+.tab:hover { color: var(--text); background: white; }
+.tab.active { background: var(--primary); color: white; box-shadow: 0 1px 3px rgba(30,64,175,.3); }
+.tab-panel { display: none; padding: 20px; }
+.tab-panel.active { display: block; }
+
+.dist-size-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 16px 20px;
+    background: #fffbeb;
+    border-bottom: 1px solid #fef3c7;
+}
+
+/* Service rows */
+.service-row {
+    display: grid;
+    grid-template-columns: 1fr 130px;
+    gap: 14px;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.service-row:last-child { border-bottom: none; }
+.service-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+}
+.service-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Multi-flyer rows */
+.multi-block {
+    grid-column: 1 / -1;
+    padding: 12px 0 4px;
+}
+.multi-head {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 10px;
+}
+.multi-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    align-items: center;
+}
+.multi-row:last-child { border-bottom: none; }
+.multi-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Ah Wei section */
+.ahwei-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1.4fr;
+    gap: 24px;
+}
+.ahwei-step-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--warn);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 12px;
+}
+.ahwei-result {
+    margin-top: 18px;
+    padding: 16px 20px;
+    background: var(--primary-light);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ahwei-result-label { font-size: 13px; font-weight: 700; color: var(--primary); }
+.ahwei-result-value { font-size: 26px; font-weight: 800; color: var(--primary); }
+.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin-bottom: 12px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.ref-table th {
+    background: #334155;
+    color: white;
+    padding: 6px 8px;
+    text-align: center;
+    font-weight: 600;
+}
+.ref-table th:first-child { text-align: left; }
+.ref-table td {
+    padding: 5px 8px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+}
+.ref-table td:first-child { text-align: left; background: var(--bg-soft); color: var(--text-muted); font-weight: 600; }
+.ref-gsm-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+    margin-top: 8px;
+}
+
+/* Delivery */
+.delivery-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+.delivery-toggle label {
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+.delivery-cartons {
+    margin-top: 14px;
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: end;
+}
+.delivery-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 10px 12px;
+    background: var(--bg-soft);
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 24px;
+}
+.summary-card {
+    background: var(--primary-dark);
+    color: white;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 6px 24px rgba(30,58,138,.2);
+}
+.summary-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #93c5fd;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.sum-section { margin-bottom: 16px; }
+.sum-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+}
+.sum-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: #cbd5e1;
+    padding: 3px 0;
+}
+.sum-line span { flex: 1; }
+.sum-line b { color: white; font-weight: 600; white-space: nowrap; }
+.sum-empty {
+    font-size: 12px;
+    color: #64748b;
+    font-style: italic;
+    padding: 4px 0;
+}
+
+.grand-total-box {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 2px solid rgba(255,255,255,.15);
+    text-align: center;
+}
+.grand-total-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 1.5px;
+}
+.grand-total-value {
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    margin-top: 4px;
+    letter-spacing: -1px;
+}
+
+/* Checkbox custom */
+.check {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+/* Utility */
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.chevron { font-size: 14px; color: var(--text-muted); transition: transform .2s; }
+.chevron.open { transform: rotate(90deg); }
+.pill-warn {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #fef3c7;
+    color: var(--warn);
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+@media (max-width: 1100px) {
+    .page { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .print-grid { grid-template-columns: 1fr 1fr; }
+    .ahwei-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="page-header">
+        <div>
+            <div class="page-title">Hybrid Quotation Calculator</div>
+            <div class="page-subtitle">Printing + Distribution + Delivery</div>
+        </div>
+        <button class="btn btn-reset" onclick="resetAll()">Reset All</button>
+    </div>
+
+    <!-- Main content -->
+    <div>
+        <!-- 1. Printing & Finishing -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">1</span>Printing &amp; Finishing</div>
+                <div class="card-hint">Uses next tier UP pricing</div>
+            </div>
+            <div class="card-body">
+                <div class="print-grid">
+                    <div>
+                        <label class="fld-label">Size</label>
+                        <select id="pSize" onchange="update()">
+                            <option value="A5">A5 Flyer</option>
+                            <option value="A4">A4 Flyer</option>
+                            <option value="A3">A3 Flyer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="fld-label">Paper GSM</label>
+                        <select id="pGsm" onchange="update()">
+                            <option value="80">80GSM Simili</option>
+                            <option value="128">128GSM Art Paper</option>
+                            <option value="157">157GSM Art Paper</option>
+                            <option value="260">260GSM Art Card</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="fld-label">Printing Side</label>
+                        <select id="pSide" onchange="update()">
+                            <option value="ss">Single Sided</option>
+                            <option value="ds">Double Sided</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="fld-label">Quantity</label>
+                        <input type="number" id="pQty" placeholder="e.g. 10000" oninput="update()">
+                    </div>
+                </div>
+
+                <div class="finishing-grid">
+                    <div class="finishing-title">Add-on Printing &amp; Finishing <span class="pill-warn">TBD pricing</span></div>
+                    <div class="finishing-row">
+                        <select id="pAddon" onchange="update()">
+                            <option value="0">Add-on Printing: No</option>
+                            <option value="1">Add-on Printing: Yes</option>
+                        </select>
+                        <input type="number" id="pAddQty" placeholder="Add-on Qty" oninput="update()">
+                        <select class="f-opt" data-name="Folding" onchange="update()">
+                            <option value="0">Folding: No</option><option value="1">Folding: Yes</option>
+                        </select>
+                        <select class="f-opt" data-name="Matte Paper" onchange="update()">
+                            <option value="0">Matte Paper: No</option><option value="1">Matte Paper: Yes</option>
+                        </select>
+                        <select class="f-opt" data-name="Crease+Fold" onchange="update()">
+                            <option value="0">Crease+Fold: No</option><option value="1">Crease+Fold: Yes</option>
+                        </select>
+                        <select class="f-opt" data-name="Perforation" onchange="update()">
+                            <option value="0">Perforation: No</option><option value="1">Perforation: Yes</option>
+                        </select>
+                        <select class="f-opt" data-name="Gloss Lami" onchange="update()">
+                            <option value="0">Gloss Lami: No</option><option value="1">Gloss Lami: Yes</option>
+                        </select>
+                        <select class="f-opt" data-name="Matte Lami" onchange="update()">
+                            <option value="0">Matte Lami: No</option><option value="1">Matte Lami: Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Ah Wei Quote (collapsible) -->
+        <div class="card">
+            <div class="card-head clickable" onclick="toggleAhwei()">
+                <div class="card-title">
+                    <span class="card-num">2</span>
+                    <input type="checkbox" id="ahweiToggle" class="check" onclick="event.stopPropagation(); toggleAhwei(true);" style="margin-right:10px;">
+                    Ah Wei Quote <span style="font-weight:500; color:var(--text-muted); margin-left:6px;">(Optional)</span>
+                </div>
+                <span id="ahweiChevron" class="chevron">▸</span>
+            </div>
+            <div id="ahweiBody" style="display:none;">
+                <div class="card-body">
+                    <div class="ahwei-grid">
+                        <div>
+                            <div class="ahwei-step-title">Step 1 — Input Costs</div>
+                            <div style="margin-bottom:12px;">
+                                <label class="fld-label">Ah Wei Cost ($)</label>
+                                <input type="number" id="ahweiCost" placeholder="0" oninput="update()">
+                            </div>
+                            <div style="margin-bottom:16px;">
+                                <label class="fld-label">Quantity</label>
+                                <input type="number" id="ahweiQty" placeholder="0" oninput="update()">
+                            </div>
+                            <div class="ahwei-step-title">Step 2 — Internal Pricing</div>
+                            <div style="margin-bottom:12px;">
+                                <label class="fld-label">Our Standard Cost ($ per 1K)</label>
+                                <input type="number" id="ahweiStd" placeholder="e.g. 179" oninput="update()">
+                            </div>
+                            <div>
+                                <label class="fld-label">Number of Rounds</label>
+                                <input type="number" id="ahweiRounds" value="1" min="1" oninput="update()">
+                            </div>
+                            <div class="ahwei-result">
+                                <span class="ahwei-result-label">Final Quote</span>
+                                <span id="ahweiResult" class="ahwei-result-value">$0.00</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="ahwei-step-title">Reference Rates (per 1,000 units)</div>
+                            <div class="ref-gsm-label">128gsm</div>
+                            <table class="ref-table">
+                                <thead><tr><th>QTY</th><th>A5</th><th>A4</th><th>A3</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1k – 1,999</td><td>179</td><td>182</td><td>202</td></tr>
+                                    <tr><td>2k – 2,999</td><td>139</td><td>147</td><td>167</td></tr>
+                                    <tr><td>3k – 3,999</td><td>129</td><td>137</td><td>157</td></tr>
+                                    <tr><td>4k &amp; Above</td><td>109</td><td>117</td><td>137</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="ref-gsm-label">157gsm</div>
+                            <table class="ref-table">
+                                <thead><tr><th>QTY</th><th>A5</th><th>A4</th><th>A3</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1k – 1,999</td><td>181</td><td>184</td><td>204</td></tr>
+                                    <tr><td>2k – 2,999</td><td>141</td><td>149</td><td>169</td></tr>
+                                    <tr><td>3k – 3,999</td><td>131</td><td>139</td><td>159</td></tr>
+                                    <tr><td>4k &amp; Above</td><td>111</td><td>119</td><td>139</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="ref-gsm-label">260gsm</div>
+                            <table class="ref-table">
+                                <thead><tr><th>QTY</th><th>A5</th><th>A4</th><th>A3</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1k – 1,999</td><td>185</td><td>188</td><td>208</td></tr>
+                                    <tr><td>2k – 2,999</td><td>145</td><td>153</td><td>173</td></tr>
+                                    <tr><td>3k – 3,999</td><td>135</td><td>143</td><td>163</td></tr>
+                                    <tr><td>4k &amp; Above</td><td>115</td><td>123</td><td>143</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Distribution Services (tabbed) -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">3</span>Distribution Services</div>
+                <div class="card-hint">Tier-based with proration</div>
+            </div>
+            <div class="tabs-bar">
+                <button class="tab active" data-tab="hdb" onclick="switchTab('hdb')">HDB</button>
+                <button class="tab" data-tab="landed" onclick="switchTab('landed')">Landed</button>
+                <button class="tab" data-tab="ind" onclick="switchTab('ind')">Industrial</button>
+                <button class="tab" data-tab="walk" onclick="switchTab('walk')">Walkway &amp; Manpower</button>
+            </div>
+            <div class="dist-size-row">
+                <div>
+                    <label class="fld-label">Flyer Size (for Distribution)</label>
+                    <select id="dSize" onchange="update()">
+                        <option value="A5">A5</option>
+                        <option value="A4">A4</option>
+                        <option value="A3">A3</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="fld-label">Paper GSM (for Distribution)</label>
+                    <select id="dGsm" onchange="update()">
+                        <option value="128">128gsm</option>
+                        <option value="157">157gsm</option>
+                        <option value="260">260gsm</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- HDB tab -->
+            <div class="tab-panel active" id="panel-hdb">
+                <div class="service-row"><div><div class="service-label">HDB Landmark</div><div class="service-hint">Standard door-to-door</div></div><input type="number" class="d-val" data-type="hdb-std" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">HDB Selected Estate</div></div><input type="number" class="d-val" data-type="hdb-estate" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">HDB Selected Blocks (通)</div></div><input type="number" class="d-val" data-type="hdb-tong" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">HDB Selected Blocks (不通)</div></div><input type="number" class="d-val" data-type="hdb-butong" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">HDB Letterbox</div></div><input type="number" class="d-val" data-type="hdb-lb" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Express HDB Add-on</div><div class="service-hint">Min $150</div></div><input type="number" class="d-val" data-type="express-hdb" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Additional Landmark</div><div class="service-hint">$40 per landmark</div></div><input type="number" class="d-val" data-type="landmark" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Solo Flyer</div><div class="service-hint">Flat rate by GSM</div></div><input type="number" class="d-val" data-type="solo" oninput="update()"></div>
+                <div class="multi-block">
+                    <div class="multi-head">Multiple Flyer per Unit</div>
+                    <div style="margin-bottom:10px;"><input type="number" id="hdbMultiCount" min="0" max="10" placeholder="Number of designs (0-10)" oninput="updateMultiDesigns('hdb')" style="max-width:280px;"></div>
+                    <div id="hdbMultiRows"></div>
+                </div>
+            </div>
+
+            <!-- Landed tab -->
+            <div class="tab-panel" id="panel-landed">
+                <div class="service-row"><div><div class="service-label">Letter Box</div></div><input type="number" class="d-val" data-type="landed" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Express Add-on</div><div class="service-hint">Min $150</div></div><input type="number" class="d-val" data-type="express-landed" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Additional Landmark</div><div class="service-hint">$40 per landmark</div></div><input type="number" class="d-val" data-type="landed-landmark" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Solo Flyer</div></div><input type="number" class="d-val" data-type="landed-solo" oninput="update()"></div>
+                <div class="multi-block">
+                    <div class="multi-head">Multiple per Unit</div>
+                    <div style="margin-bottom:10px;"><input type="number" id="landedMultiCount" min="0" max="10" placeholder="Number of designs (0-10)" oninput="updateMultiDesigns('landed')" style="max-width:280px;"></div>
+                    <div id="landedMultiRows"></div>
+                </div>
+            </div>
+
+            <!-- Industrial tab -->
+            <div class="tab-panel" id="panel-ind">
+                <div class="service-row"><div><div class="service-label">Letter Box</div></div><input type="number" class="d-val" data-type="industrial" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Express Add-on</div><div class="service-hint">Min $150</div></div><input type="number" class="d-val" data-type="express-industrial" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Additional Landmark</div><div class="service-hint">$40 per landmark</div></div><input type="number" class="d-val" data-type="ind-landmark" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Solo Flyer</div></div><input type="number" class="d-val" data-type="ind-solo" oninput="update()"></div>
+                <div class="multi-block">
+                    <div class="multi-head">Multiple per Unit</div>
+                    <div style="margin-bottom:10px;"><input type="number" id="indMultiCount" min="0" max="10" placeholder="Number of designs (0-10)" oninput="updateMultiDesigns('ind')" style="max-width:280px;"></div>
+                    <div id="indMultiRows"></div>
+                </div>
+            </div>
+
+            <!-- Walkway tab -->
+            <div class="tab-panel" id="panel-walk">
+                <div class="service-row"><div><div class="service-label">Walkway Standard</div><div class="service-hint">Qty = # of slots</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway (School)</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway (Remote Place)</div></div><input type="number" class="d-val" data-type="walk-remote" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway Selected Date</div></div><input type="number" class="d-val" data-type="walk-exp" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway Express (Remote)</div></div><input type="number" class="d-val" data-type="walk-expr" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway Sandwich Board</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway Backpack</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Printing Formboard Add-on</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
+            </div>
+        </div>
+
+        <!-- 4. Delivery -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">4</span>Delivery Service</div>
+                <div class="card-hint">Min $30, +$10 per 10 cartons</div>
+            </div>
+            <div class="card-body">
+                <div class="delivery-toggle" onclick="var c=document.getElementById('delToggle'); c.checked=!c.checked; update();">
+                    <label>Require delivery?</label>
+                    <input type="checkbox" id="delToggle" class="check" onchange="update()" onclick="event.stopPropagation();">
+                </div>
+                <div id="delCartonWrap" class="delivery-cartons">
+                    <div>
+                        <label class="fld-label">Number of Cartons</label>
+                        <input type="number" id="delCartons" min="0" placeholder="e.g. 5" oninput="update()">
+                    </div>
+                    <div>
+                        <label class="fld-label">Fee</label>
+                        <div style="padding:10px 12px; background:var(--bg-soft); border-radius:8px; font-weight:700; color:var(--primary-dark);"><span id="delFeeDisplay">$0.00</span></div>
+                    </div>
+                </div>
+                <div class="delivery-hint">1-10 cartons = $30 · 11-20 = $40 · 21-30 = $50 · +$10 per additional 10</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="summary-card">
+            <div class="summary-title">Quotation Summary</div>
+            <div id="pBreak" class="sum-section"></div>
+            <div id="ahweiBreak" class="sum-section"></div>
+            <div id="dBreak" class="sum-section"></div>
+            <div id="emptyMsg" class="sum-empty">Enter values to see your quote breakdown…</div>
+            <div class="grand-total-box">
+                <span class="grand-total-label">GRAND TOTAL</span>
+                <span class="grand-total-value" id="sumGrand">$0.00</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========= PRINTING DATA (from PDF) =========
+var HYBRID_PRINT={
+"A5":{
+"80":[[600,109,143],[1000,119,153],[2000,129,163],[4000,139,173],[6000,169,223],[8000,176,223],[10000,202,223],[12000,223,246],[14000,243,270],[16000,263,293],[18000,273,305],[20000,282,315],[24000,314,351],[28000,335,400],[32000,381,434],[36000,391,466],[40000,464,525],[48000,502,553],[56000,567,636],[60000,617,711],[64000,670,764],[72000,681,787],[80000,745,825],[88000,808,862],[90000,872,891],[96000,936,956],[100000,978,1022],[104000,1094,1172],[112000,1158,1180],[120000,1222,1246],[128000,1286,1311],[136000,1318,1344],[140000,1350,1377],[144000,1414,1442],[152000,1478,1507],[160000,1542,1573],[168000,1606,1638],[176000,1638,1671],[180000,1666,1704],[184000,1670,1736],[192000,1702,1887],[200000,1788,2026],[208000,2003,2244],[224000,2045,2259],[240000,2124,2398],[256000,2245,2537],[272000,2367,2676],[280000,2427,2746],[288000,2488,2816],[304000,2703,3048],[320000,2825,3187],[336000,2946,3327],[352000,3067,3466],[360000,3128,3535],[368000,3189,3605],[384000,3310,3744],[400000,3432,3883]],
+"128":[[600,133,163],[1000,143,173],[2000,153,203],[4000,163,223],[6000,203,251],[8000,231,251],[10000,231,251],[12000,256,279],[14000,282,307],[16000,308,334],[18000,319,348],[20000,330,363],[24000,374,414],[28000,428,476],[32000,467,516],[36000,516,573],[40000,580,625],[48000,613,709],[56000,697,784],[60000,782,880],[64000,819,885],[72000,867,975],[80000,952,1072],[88000,1052,1142],[90000,1073,1165],[96000,1124,1246],[100000,1224,1330],[104000,1347,1448],[112000,1403,1517],[120000,1489,1611],[128000,1575,1705],[136000,1661,1799],[140000,1704,1846],[144000,1747,1893],[152000,1833,1987],[160000,1919,2081],[168000,2005,2175],[176000,2091,2268],[180000,2134,2315],[184000,2177,2362],[192000,2263,2456],[200000,2376,2615],[208000,2595,2794],[224000,2636,2893],[240000,2803,3077],[256000,2969,3261],[272000,3136,3445],[280000,3219,3537],[288000,3302,3629],[304000,3562,3907],[320000,3729,4091],[336000,3895,4275],[352000,4061,4460],[360000,4145,4552],[368000,4228,4644],[384000,4394,4828],[400000,4561,5012]],
+"157":[[600,165,201],[1000,175,211],[2000,187,247],[4000,199,270],[6000,247,270],[8000,249,270],[10000,249,270],[12000,276,300],[14000,302,330],[16000,329,360],[18000,343,375],[20000,362,399],[24000,421,466],[28000,472,544],[32000,527,607],[36000,573,645],[40000,633,705],[48000,700,778],[56000,799,890],[60000,887,969],[64000,899,972],[72000,998,1077],[80000,1097,1184],[88000,1218,1309],[90000,1312,1418],[96000,1320,1433],[100000,1421,1527],[104000,1536,1637],[112000,1615,1729],[120000,1716,1838],[128000,1818,1947],[136000,1919,2056],[140000,1969,2111],[144000,2020,2165],[152000,2121,2274],[160000,2222,2383],[168000,2323,2492],[176000,2424,2601],[180000,2475,2656],[184000,2525,2710],[192000,2626,2819],[200000,2780,3019],[208000,2973,3172],[224000,3071,3327],[240000,3268,3542],[256000,3466,3758],[272000,3663,3973],[280000,3762,4080],[288000,3860,4188],[304000,4151,4496],[320000,4348,4711],[336000,4546,4926],[352000,4743,5141],[360000,4842,5249],[368000,4940,5356],[384000,5138,5572],[400000,5335,5787]],
+"260":[[600,186,212],[1000,193,221],[2000,232,252],[3000,250,286],[4000,280,318],[5000,313,349],[6000,356,390],[7000,392,406],[8000,392,406],[9000,392,406],[10000,392,406],[12000,435,454],[14000,492,514],[16000,549,574],[18000,606,634],[20000,663,695],[24000,781,830],[28000,885,947],[32000,988,1065],[36000,1092,1183],[40000,1196,1300]]
+},
+"A4":{
+"80":[[300,99,133],[500,109,143],[1000,129,163],[2000,139,173],[3000,158,218],[4000,176,263],[5000,205,282],[6000,244,277],[7000,274,310],[8000,274,310],[9000,274,310],[10000,274,310],[12000,314,351],[14000,335,400],[16000,381,434],[18000,391,466],[20000,438,516],[24000,502,553],[28000,567,636],[30000,584,674],[32000,617,711],[36000,681,787],[40000,745,825],[44000,808,862],[48000,872,891],[50000,904,923],[52000,1030,1050],[56000,1094,1115],[60000,1158,1180],[64000,1222,1246],[68000,1286,1311],[70000,1318,1344],[72000,1350,1377],[76000,1414,1442],[80000,1478,1507],[84000,1542,1573],[88000,1606,1638],[90000,1638,1671],[92000,1666,1704],[94000,1670,1736],[96000,1702,1834],[100000,1798,1887],[104000,1881,2120],[112000,2003,2259],[120000,2124,2398],[128000,2245,2537],[136000,2367,2676],[140000,2427,2746],[144000,2488,2816],[152000,2703,3048],[160000,2825,3187],[168000,2946,3327],[176000,3067,3466],[180000,3128,3535],[184000,3189,3605],[192000,3310,3744],[200000,3432,3883]],
+"128":[[300,133,183],[500,143,193],[1000,153,203],[2000,163,223],[3000,201,253],[4000,239,283],[5000,286,326],[6000,329,369],[7000,329,379],[8000,329,379],[9000,329,379],[10000,329,379],[12000,374,414],[14000,428,476],[16000,467,516],[18000,516,573],[20000,531,610],[24000,613,709],[28000,697,784],[30000,741,831],[32000,782,880],[36000,867,975],[40000,952,1072],[44000,1052,1142],[45000,1073,1165],[50000,1181,1283],[52000,1317,1423],[56000,1403,1517],[60000,1489,1611],[64000,1575,1705],[68000,1661,1799],[70000,1704,1846],[72000,1747,1893],[76000,1833,1987],[80000,1919,2081],[84000,2005,2175],[88000,2091,2268],[90000,2134,2315],[92000,2177,2362],[96000,2263,2456],[100000,2350,2550],[104000,2470,2709],[112000,2636,2893],[120000,2803,3077],[128000,2969,3261],[136000,3136,3445],[140000,3219,3537],[144000,3302,3629],[152000,3469,3814],[160000,3729,4091],[168000,3895,4275],[176000,4061,4460],[180000,4145,4552],[184000,4228,4644],[192000,4394,4828],[200000,4561,5012]],
+"157":[[300,168,197],[500,170,205],[1000,186,214],[2000,207,248],[3000,240,283],[4000,274,317],[5000,305,353],[6000,345,397],[7000,368,406],[8000,368,406],[9000,368,406],[10000,368,406],[12000,421,466],[14000,472,544],[16000,527,607],[18000,573,645],[20000,600,671],[24000,700,778],[28000,799,890],[30000,849,946],[32000,899,969],[36000,998,1077],[40000,1097,1184],[44000,1218,1309],[45000,1320,1418],[50000,1370,1472],[52000,1514,1620],[56000,1615,1729],[60000,1716,1838],[64000,1818,1947],[68000,1919,2056],[70000,1969,2111],[72000,2020,2165],[76000,2121,2274],[80000,2222,2383],[84000,2323,2492],[88000,2424,2601],[90000,2475,2656],[92000,2525,2710],[96000,2626,2819],[100000,2727,2928],[104000,2874,3112],[112000,3071,3327],[120000,3268,3542],[128000,3466,3758],[136000,3663,3973],[140000,3762,4080],[144000,3860,4188],[152000,4058,4403],[160000,4348,4711],[168000,4546,4926],[176000,4743,5141],[180000,4842,5249],[184000,4940,5356],[192000,5138,5572],[200000,5335,5787]],
+"260":[[300,191,216],[500,196,223],[1000,235,247],[2000,277,322],[3000,348,383],[4000,429,441],[5000,496,517],[6000,574,599],[7000,651,681],[8000,663,695],[9000,663,695],[10000,663,695],[12000,781,830],[14000,885,947],[16000,988,1065],[18000,1092,1183],[20000,1196,1300]]
+},
+"A3":{
+"80":[[300,149,191],[500,152,196],[1000,167,212],[2000,198,250],[3000,231,293],[4000,265,336],[5000,303,370],[6000,339,411],[7000,376,453],[8000,412,494],[9000,417,498],[10000,417,498],[12000,479,577],[16000,607,729],[20000,688,802],[24000,851,972],[28000,1059,1191],[30000,1120,1261],[32000,1180,1331],[36000,1302,1470],[40000,1423,1609],[44000,1545,1748],[48000,1666,1887],[50000,1727,1957],[52000,1881,2120],[56000,2003,2259],[60000,2124,2398],[64000,2245,2537],[68000,2367,2676],[70000,2427,2746],[72000,2488,2816],[76000,2703,3048],[80000,2825,3187],[84000,2946,3327],[88000,3067,3466],[90000,3128,3535],[92000,3189,3605],[96000,3310,3744],[100000,3432,3883]],
+"128":[[300,155,202],[500,159,206],[1000,181,251],[2000,222,277],[3000,272,326],[4000,322,375],[5000,374,423],[6000,429,481],[7000,486,520],[8000,541,595],[9000,545,624],[10000,545,624],[12000,633,717],[16000,780,892],[20000,911,1023],[24000,1124,1246],[28000,1378,1510],[30000,1461,1602],[32000,1544,1694],[36000,1711,1878],[40000,1877,2063],[44000,2043,2247],[48000,2210,2431],[50000,2293,2523],[52000,2470,2709],[56000,2636,2893],[60000,2803,3077],[64000,2969,3261],[68000,3136,3445],[70000,3219,3537],[72000,3302,3629],[76000,3562,3907],[80000,3729,4091],[84000,3895,4275],[88000,4061,4460],[90000,4145,4552],[92000,4228,4644],[96000,4394,4828],[100000,4561,5012]],
+"157":[[300,161,207],[500,165,209],[1000,191,239],[2000,245,302],[3000,302,353],[4000,358,404],[5000,421,473],[6000,479,548],[7000,538,623],[8000,596,683],[9000,623,683],[10000,623,683],[12000,727,795],[16000,933,1019],[20000,1077,1129],[24000,1312,1433],[28000,1596,1728],[30000,1695,1836],[32000,1793,1944],[36000,1991,2159],[40000,2188,2374],[44000,2385,2589],[48000,2583,2804],[50000,2681,2911],[52000,2874,3112],[56000,3071,3327],[60000,3268,3542],[64000,3466,3758],[68000,3663,3973],[70000,3762,4080],[72000,3860,4188],[76000,4151,4496],[80000,4348,4711],[84000,4546,4926],[88000,4743,5141],[90000,4842,5249],[92000,4940,5356],[96000,5138,5572],[100000,5335,5787]],
+"260":[[300,177,219],[500,188,233],[1000,225,266],[2000,301,336],[3000,397,419],[4000,494,539],[5000,613,614],[6000,706,716],[7000,810,810],[8000,904,974],[9000,999,1081],[10000,1096,1190]]
+}
+};
+
+// ========= DISTRIBUTION DATA =========
+var HDB_STD={
+"128":[[1000,149,155,175],[2000,177,189,229],[3000,194,212,272],[4000,212,236,316],[5000,240,270,370],[6000,288,324,444],[7000,301,343,483],[8000,344,392,552],[9000,360,418,594],[10000,380,440,640]],
+"157":[[1000,151,160,185],[2000,181,199,233],[3000,200,227,292],[4000,230,266,341],[5000,250,295,400],[6000,300,354,479],[7000,315,378,523],[8000,348,432,597],[9000,372,459,644],[10000,400,490,690]],
+"260":[[1000,155,175,215],[2000,189,259,309],[3000,212,272,392],[4000,236,316,476],[5000,270,370,570],[6000,324,396,684],[7000,343,483,763],[8000,392,552,872],[9000,418,594,954],[10000,440,640,1040]]
+};
+var HDB_STD_RATE={"128":{A5:38,A4:44,A3:64},"157":{A5:40,A4:49,A3:69},"260":{A5:44,A4:64,A3:104}};
+
+var HDB_ESTATE={
+"128":[[1000,151,157,177],[2000,218,230,270],[3000,297,315,375],[4000,316,340,420]],
+"157":[[1000,153,160,185],[2000,222,240,280],[3000,303,330,390],[4000,324,360,440]],
+"260":[[1000,157,177,215],[2000,230,270,350],[3000,315,375,495],[4000,340,420,540]]
+};
+var HDB_ESTATE_RATE={"128":{A5:79,A4:85,A3:105},"157":{A5:81,A4:90,A3:110},"260":{A5:85,A4:105,A3:135}};
+
+var HDB_TONG={
+"128":[[1000,179,182,202],[2000,278,294,334],[3000,387,411,471],[4000,436,468,548]],
+"157":[[1000,181,187,207],[2000,282,304,344],[3000,393,426,486],[4000,444,488,568]],
+"260":[[1000,185,202,242],[2000,290,334,414],[3000,405,471,591],[4000,460,548,668]]
+};
+var HDB_TONG_RATE={"128":{A5:109,A4:117,A3:137},"157":{A5:111,A4:122,A3:142},"260":{A5:115,A4:137,A3:167}};
+
+var HDB_BUTONG={
+"128":[[1000,219,227,247],[2000,359,375,415],[3000,507,531,591],[4000,596,628,708]],
+"157":[[1000,221,232,252],[2000,363,385,425],[3000,513,546,606],[4000,604,648,728]],
+"260":[[1000,225,247,287],[2000,371,415,495],[3000,525,591,711],[4000,620,708,828]]
+};
+var HDB_BUTONG_RATE={"128":{A5:149,A4:157,A3:177},"157":{A5:151,A4:162,A3:182},"260":{A5:155,A4:177,A3:207}};
+
+var SOLELY={"128":{A5:15,A4:15,A3:15},"157":{A5:17,A4:17,A3:17},"260":{A5:21,A4:21,A3:21}};
+
+var LANDED={
+"128":[[1000,189,194,229],[2000,213,223,293],[3000,258,284,393],[4000,284,304,444]],
+"157":[[1000,192,219,234],[2000,219,253,298],[3000,282,323,398],[4000,296,364,464]],
+"260":[[1000,194,229,309],[2000,223,293,453],[3000,284,393,633],[4000,304,444,764]]
+};
+var LANDED_RATE={"128":{A5:71,A4:76,A3:111},"157":{A5:74,A4:91,A3:116},"260":{A5:76,A4:111,A3:191}};
+
+var HDB_LB={};
+Object.keys(HDB_STD).forEach(function(g){HDB_LB[g]=HDB_STD[g].map(function(r){var d=(r[0]/1000)*2;return [r[0],r[1]-d,r[2]-d,r[3]-d];});});
+var HDB_LB_RATE={};
+Object.keys(HDB_STD_RATE).forEach(function(g){var r=HDB_STD_RATE[g];HDB_LB_RATE[g]={A5:r.A5-2,A4:r.A4-2,A3:r.A3-2};});
+
+var WALK_STD={
+"128":[[1,142,147,182],[2,178,188,258],[3,252,278,387],[4,276,296,436]],
+"157":[[1,145,172,187],[2,184,218,263],[3,276,317,392],[4,288,356,456]],
+"260":[[1,147,182,262],[2,188,258,418],[3,278,387,627],[4,296,436,756]]
+};
+var WALK_STD_RATE={"128":{A5:69,A4:74,A3:109},"157":{A5:72,A4:89,A3:114},"260":{A5:74,A4:109,A3:189}};
+var WALK_REMOTE={
+"128":[[1,172,177,212],[2,238,248,318],[3,342,357,477],[4,396,416,556]],
+"157":[[1,175,202,217],[2,244,278,323],[3,351,369,482],[4,408,476,576]],
+"260":[[1,177,212,292],[2,248,318,478],[3,368,466,717],[4,416,556,876]]
+};
+var WALK_REMOTE_RATE={"128":{A5:99,A4:104,A3:139},"157":{A5:102,A4:119,A3:144},"260":{A5:104,A4:139,A3:219}};
+var WALK_EXP={
+"128":[[1,207,212,247],[2,309,318,388],[3,447,473,582],[4,536,556,696]],
+"157":[[1,210,237,252],[2,315,348,393],[3,456,512,587],[4,548,616,716]],
+"260":[[1,212,247,327],[2,319,388,548],[3,473,582,822],[4,556,696,1016]]
+};
+var WALK_EXP_RATE={"128":{A5:134,A4:139,A3:174},"157":{A5:137,A4:154,A3:179},"260":{A5:139,A4:174,A3:254}};
+var WALK_EXPR={
+"128":[[1,237,242,277],[2,369,379,449],[3,537,552,672],[4,656,676,816]],
+"157":[[1,240,267,282],[2,375,409,454],[3,546,591,677],[4,668,736,836]],
+"260":[[1,242,277,357],[2,379,449,609],[3,563,661,912],[4,676,816,1136]]
+};
+var WALK_EXPR_RATE={"128":{A5:164,A4:169,A3:204},"157":{A5:167,A4:184,A3:209},"260":{A5:169,A4:204,A3:284}};
+
+var DIST_TIER_MAP={
+    'hdb-std':{tiers:HDB_STD,rate:HDB_STD_RATE,maxQty:10000},
+    'hdb-estate':{tiers:HDB_ESTATE,rate:HDB_ESTATE_RATE,maxQty:4000},
+    'hdb-tong':{tiers:HDB_TONG,rate:HDB_TONG_RATE,maxQty:4000},
+    'hdb-butong':{tiers:HDB_BUTONG,rate:HDB_BUTONG_RATE,maxQty:4000},
+    'hdb-lb':{tiers:HDB_LB,rate:HDB_LB_RATE,maxQty:10000},
+    'landed':{tiers:LANDED,rate:LANDED_RATE,maxQty:4000},
+    'industrial':{tiers:LANDED,rate:LANDED_RATE,maxQty:4000}
+};
+var WALK_MAP={
+    'walk-std':{tiers:WALK_STD,rate:WALK_STD_RATE},
+    'walk-remote':{tiers:WALK_REMOTE,rate:WALK_REMOTE_RATE},
+    'walk-exp':{tiers:WALK_EXP,rate:WALK_EXP_RATE},
+    'walk-expr':{tiers:WALK_EXPR,rate:WALK_EXPR_RATE}
+};
+var EXPRESS_RATE_PER_K={hdb:20,landed:40,industrial:40};
+var EXPRESS_MIN=150;
+var LANDMARK_RATE=40;
+
+function getDeliveryFee(c){if(c<=0)return 0;return Math.ceil(c/10)*10+20;}
+
+function getPrintCost(size,gsm,side,qty){
+    var tiers=HYBRID_PRINT[size]&&HYBRID_PRINT[size][gsm];
+    if(!tiers||qty<=0)return {cost:0,exceeded:false};
+    var col=(side==='ds')?2:1;
+    for(var i=0;i<tiers.length;i++){if(qty<=tiers[i][0])return {cost:tiers[i][col],exceeded:false};}
+    return {cost:tiers[tiers.length-1][col],exceeded:true};
+}
+
+function prorate(tiers,qty,sizeIdx){
+    if(!tiers||!tiers.length)return 0;
+    for(var i=0;i<tiers.length;i++){
+        if(qty===tiers[i][0])return tiers[i][sizeIdx];
+        if(qty<tiers[i][0]){
+            if(i===0){var calc=tiers[0][sizeIdx]*(qty/tiers[0][0]);return Math.min(calc,tiers[0][sizeIdx]);}
+            var unitRate=tiers[i-1][sizeIdx]/tiers[i-1][0];
+            var calc=unitRate*qty;
+            return Math.min(calc,tiers[i][sizeIdx]);
+        }
+    }
+    return null;
+}
+
+function getDistCost(type,gsm,size,qty){
+    var sizeIdx={A5:1,A4:2,A3:3}[size]||1;
+    var map=DIST_TIER_MAP[type];
+    if(!map)return 0;
+    var g=(gsm==='80')?'128':gsm;
+    var t=map.tiers[g],r=map.rate[g];
+    if(!t||!r)return 0;
+    var p=prorate(t,qty,sizeIdx);
+    if(p!==null)return p;
+    var base=t[t.length-1][sizeIdx];
+    var rate=r[size]||0;
+    return base+((qty-map.maxQty)/1000)*rate;
+}
+
+function getWalkCost(type,gsm,size,slots){
+    var sizeIdx={A5:1,A4:2,A3:3}[size]||1;
+    var map=WALK_MAP[type];
+    if(!map)return 0;
+    var g=(gsm==='80')?'128':gsm;
+    var t=map.tiers[g],r=map.rate[g];
+    if(!t||!r)return 0;
+    for(var i=0;i<t.length;i++){if(slots===t[i][0])return t[i][sizeIdx];}
+    if(slots>4)return t[t.length-1][sizeIdx]+(slots-4)*(r[size]||0);
+    return 0;
+}
+
+function getAhweiCost(){
+    if(!document.getElementById('ahweiToggle').checked)return 0;
+    var ahwei=parseFloat(document.getElementById('ahweiCost').value)||0;
+    var qty=parseFloat(document.getElementById('ahweiQty').value)||0;
+    var stdCost=parseFloat(document.getElementById('ahweiStd').value)||0;
+    var rounds=parseFloat(document.getElementById('ahweiRounds').value)||1;
+    if(qty<=0)return 0;
+    var surcharge=(((ahwei/qty)*1000)-35)*2;
+    var finalRate=stdCost+surcharge;
+    return Math.ceil((finalRate/1000)*qty*rounds);
+}
+
+function switchTab(name){
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===name);});
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+name);});
+}
+
+function toggleAhwei(fromCheckbox){
+    var cb=document.getElementById('ahweiToggle');
+    if(!fromCheckbox)cb.checked=!cb.checked;
+    var body=document.getElementById('ahweiBody');
+    var chev=document.getElementById('ahweiChevron');
+    body.style.display=cb.checked?'block':'none';
+    chev.classList.toggle('open',cb.checked);
+    update();
+}
+
+function updateMultiDesigns(section){
+    var count=parseInt(document.getElementById(section+'MultiCount').value)||0;
+    if(count>10)count=10;
+    var container=document.getElementById(section+'MultiRows');
+    var html='';
+    for(var d=0;d<count;d++){
+        html+='<div class="multi-row">';
+        html+='<div class="multi-num">#'+(d+1)+'</div>';
+        html+='<select id="'+section+'MultiSize'+d+'" onchange="update()"><option value="A5">A5</option><option value="A4" selected>A4</option><option value="A3">A3</option></select>';
+        html+='<select id="'+section+'MultiGsm'+d+'" onchange="update()"><option value="128">128gsm</option><option value="157">157gsm</option><option value="260">260gsm</option></select>';
+        html+='<input type="number" id="'+section+'MultiQty'+d+'" placeholder="Qty" oninput="update()">';
+        html+='</div>';
+    }
+    container.innerHTML=html;
+    update();
+}
+
+function update(){
+    var size=document.getElementById('pSize').value;
+    var gsm=document.getElementById('pGsm').value;
+    var side=document.getElementById('pSide').value;
+    var qty=parseInt(document.getElementById('pQty').value)||0;
+
+    var pTotal=0,dTotal=0;
+    var pH='<div class="sum-section-title">Printing &amp; Finishing</div>';
+    var dH='<div class="sum-section-title">Distribution &amp; Delivery</div>';
+    var hasP=false,hasD=false;
+
+    // Printing
+    if(qty>0){
+        var r=getPrintCost(size,gsm,side,qty);
+        if(r.cost>0){
+            pTotal+=r.cost;
+            var warn=r.exceeded?' <span style="color:#fbbf24;font-weight:700">(max tier)</span>':'';
+            pH+='<div class="sum-line"><span>'+size+' '+gsm+'gsm '+(side==='ds'?'DS':'SS')+' x'+qty.toLocaleString()+warn+'</span><b>$'+r.cost.toFixed(2)+'</b></div>';
+            hasP=true;
+        }
+    }
+
+    // Add-on print
+    if(document.getElementById('pAddon').value==='1'){
+        var aq=parseInt(document.getElementById('pAddQty').value)||0;
+        if(aq>0){
+            var ar=getPrintCost(size,gsm,side,aq);
+            if(ar.cost>0){
+                pTotal+=ar.cost;
+                pH+='<div class="sum-line"><span>Add-on Print x'+aq.toLocaleString()+'</span><b>$'+ar.cost.toFixed(2)+'</b></div>';
+                hasP=true;
+            }
+        }
+    }
+
+    // Finishing (TBD)
+    document.querySelectorAll('.f-opt').forEach(function(o){
+        if(o.value==='1'){
+            pH+='<div class="sum-line"><span>'+o.dataset.name+'</span><b style="color:#fbbf24">TBD</b></div>';
+            hasP=true;
+        }
+    });
+
+    // Ah Wei
+    var ahweiCost=getAhweiCost();
+    var ahweiH='';
+    var hasAhwei=false;
+    if(ahweiCost>0){
+        ahweiH='<div class="sum-section-title">Ah Wei Quote</div>';
+        ahweiH+='<div class="sum-line"><span>Ah Wei Total</span><b>$'+ahweiCost.toLocaleString()+'.00</b></div>';
+        hasAhwei=true;
+    }
+    document.getElementById('ahweiResult').textContent='$'+ahweiCost.toLocaleString()+'.00';
+
+    // Distribution
+    var dSize=document.getElementById('dSize').value;
+    var dGsm=document.getElementById('dGsm').value;
+
+    document.querySelectorAll('.d-val').forEach(function(input){
+        var val=parseFloat(input.value)||0;
+        if(val<=0)return;
+        var type=input.dataset.type;
+        var label=input.closest('.service-row').querySelector('.service-label').textContent;
+        var cost=0;
+
+        if(type==='express-hdb'){cost=Math.max((val/1000)*EXPRESS_RATE_PER_K.hdb,EXPRESS_MIN);}
+        else if(type==='express-landed'||type==='express-industrial'){cost=Math.max((val/1000)*EXPRESS_RATE_PER_K.landed,EXPRESS_MIN);}
+        else if(type==='landmark'||type==='landed-landmark'||type==='ind-landmark'){cost=val*LANDMARK_RATE;}
+        else if(type==='solo'||type==='landed-solo'||type==='ind-solo'){
+            var s=SOLELY[dGsm];
+            if(s)cost=(val/1000)*(s[dSize]||0);
+        }
+        else if(type.indexOf('walk-')===0){cost=getWalkCost(type,dGsm,dSize,val);}
+        else if(DIST_TIER_MAP[type]){cost=getDistCost(type,dGsm,dSize,val);}
+
+        if(cost>0){
+            cost=Math.round(cost*100)/100;
+            dTotal+=cost;
+            dH+='<div class="sum-line"><span>'+label+' x'+val.toLocaleString()+'</span><b>$'+cost.toFixed(2)+'</b></div>';
+            hasD=true;
+        }
+    });
+
+    // Multi-Flyer
+    [
+        {section:'hdb',countId:'hdbMultiCount',label:'HDB Multi-Flyer',tiers:HDB_STD,rates:HDB_STD_RATE},
+        {section:'landed',countId:'landedMultiCount',label:'Landed Multi-Flyer',tiers:LANDED,rates:LANDED_RATE},
+        {section:'ind',countId:'indMultiCount',label:'Industrial Multi-Flyer',tiers:LANDED,rates:LANDED_RATE}
+    ].forEach(function(cfg){
+        var count=parseInt(document.getElementById(cfg.countId).value)||0;
+        if(count<=0)return;
+        var designs=[];
+        for(var d=0;d<count;d++){
+            var ds=document.getElementById(cfg.section+'MultiSize'+d);
+            var dg=document.getElementById(cfg.section+'MultiGsm'+d);
+            var dq=document.getElementById(cfg.section+'MultiQty'+d);
+            if(ds&&dg&&dq)designs.push({size:ds.value,gsm:dg.value,qty:parseFloat(dq.value)||0});
+        }
+        var gsmOrder={'128':1,'157':2,'260':3};
+        var highestGsm='128';
+        designs.forEach(function(d){if((gsmOrder[d.gsm]||0)>(gsmOrder[highestGsm]||0))highestGsm=d.gsm;});
+        var rates=cfg.rates[highestGsm];
+        var tiers=cfg.tiers[highestGsm];
+        if(!rates)return;
+        var tierGroup=[],rateGroup=[];
+        designs.forEach(function(d){if(d.qty>0){if(d.qty>=3000||!tiers)rateGroup.push(d);else tierGroup.push(d);}});
+        var multiCost=0;
+        if(tierGroup.length>0){
+            var combinedQty=0,maxSizeIdx=0;
+            tierGroup.forEach(function(d){combinedQty+=d.qty;var si={A5:1,A4:2,A3:3}[d.size]||1;if(si>maxSizeIdx)maxSizeIdx=si;});
+            var p=prorate(tiers,combinedQty,maxSizeIdx);
+            if(p!==null){
+                var tierCost=p;
+                if(tierGroup.length>1)tierCost-=10;
+                var moq=tiers[0][maxSizeIdx];
+                if(tierCost<moq)tierCost=moq;
+                multiCost+=tierCost;
+            }
+        }
+        rateGroup.forEach(function(d,rIdx){
+            var fullRate=rates[d.size]||0;
+            var isTagalong=rIdx>0&&rateGroup[0].qty>=5000;
+            var rate=isTagalong?fullRate-10:fullRate;
+            multiCost+=(d.qty/1000)*rate;
+        });
+        if(multiCost>0){
+            multiCost=Math.round(multiCost*100)/100;
+            dTotal+=multiCost;
+            dH+='<div class="sum-line"><span>'+cfg.label+' ('+count+' designs)</span><b>$'+multiCost.toFixed(2)+'</b></div>';
+            hasD=true;
+        }
+    });
+
+    // Delivery
+    var delChecked=document.getElementById('delToggle').checked;
+    document.getElementById('delCartonWrap').style.display=delChecked?'grid':'none';
+    if(delChecked){
+        var cartons=parseInt(document.getElementById('delCartons').value)||0;
+        var delFee=getDeliveryFee(cartons);
+        document.getElementById('delFeeDisplay').textContent='$'+delFee.toFixed(2);
+        if(cartons>0){
+            dTotal+=delFee;
+            dH+='<div class="sum-line"><span>Delivery ('+cartons+' carton'+(cartons>1?'s':'')+')</span><b>$'+delFee.toFixed(2)+'</b></div>';
+            hasD=true;
+        }
+    }
+
+    document.getElementById('pBreak').innerHTML=hasP?pH:'';
+    document.getElementById('ahweiBreak').innerHTML=hasAhwei?ahweiH:'';
+    document.getElementById('dBreak').innerHTML=hasD?dH:'';
+    document.getElementById('emptyMsg').style.display=(hasP||hasAhwei||hasD)?'none':'block';
+    var grand=Math.round((pTotal+dTotal+ahweiCost)*100)/100;
+    document.getElementById('sumGrand').textContent='$'+grand.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function resetAll(){
+    document.querySelectorAll('input[type="number"]').forEach(function(i){i.value='';});
+    document.querySelectorAll('select').forEach(function(s){s.selectedIndex=0;});
+    document.getElementById('delToggle').checked=false;
+    document.getElementById('ahweiToggle').checked=false;
+    document.getElementById('ahweiBody').style.display='none';
+    document.getElementById('ahweiChevron').classList.remove('open');
+    document.getElementById('hdbMultiRows').innerHTML='';
+    document.getElementById('landedMultiRows').innerHTML='';
+    document.getElementById('indMultiRows').innerHTML='';
+    switchTab('hdb');
+    update();
+}
+
+update();
+</script>
+
+</body>
+</html>
