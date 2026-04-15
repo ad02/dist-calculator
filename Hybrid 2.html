@@ -192,11 +192,29 @@ select {
 .dist-size-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    padding: 16px 20px;
-    background: #fffbeb;
-    border-bottom: 1px solid #fef3c7;
+    gap: 18px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-bottom: 2px solid #f59e0b;
+    border-top: 2px solid #f59e0b;
+    position: relative;
 }
+.dist-size-row::before {
+    content: "⚡ Select Flyer Size & GSM for ALL distribution services below";
+    position: absolute;
+    top: -11px;
+    left: 16px;
+    background: #f59e0b;
+    color: white;
+    padding: 3px 12px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+}
+.dist-size-row .fld-label { color: #78350f; font-weight: 800; }
+.dist-size-row select { border-color: #f59e0b; font-weight: 700; }
 
 /* Service rows */
 .service-row {
@@ -468,7 +486,7 @@ select {
                         <label class="fld-label">Paper GSM</label>
                         <select id="pGsm" onchange="update()">
                             <option value="80">80GSM Simili</option>
-                            <option value="128">128GSM Art Paper</option>
+                            <option value="128" selected>128GSM Art Paper</option>
                             <option value="157">157GSM Art Paper</option>
                             <option value="260">260GSM Art Card</option>
                         </select>
@@ -487,31 +505,37 @@ select {
                 </div>
 
                 <div class="finishing-grid">
-                    <div class="finishing-title">Add-on Printing &amp; Finishing <span class="pill-warn">TBD pricing</span></div>
-                    <div class="finishing-row">
-                        <select id="pAddon" onchange="update()">
-                            <option value="0">Add-on Printing: No</option>
-                            <option value="1">Add-on Printing: Yes</option>
-                        </select>
-                        <input type="number" id="pAddQty" placeholder="Add-on Qty" oninput="update()">
-                        <select class="f-opt" data-name="Folding" onchange="update()">
-                            <option value="0">Folding: No</option><option value="1">Folding: Yes</option>
-                        </select>
-                        <select class="f-opt" data-name="Matte Paper" onchange="update()">
-                            <option value="0">Matte Paper: No</option><option value="1">Matte Paper: Yes</option>
-                        </select>
-                        <select class="f-opt" data-name="Crease+Fold" onchange="update()">
-                            <option value="0">Crease+Fold: No</option><option value="1">Crease+Fold: Yes</option>
-                        </select>
-                        <select class="f-opt" data-name="Perforation" onchange="update()">
-                            <option value="0">Perforation: No</option><option value="1">Perforation: Yes</option>
-                        </select>
-                        <select class="f-opt" data-name="Gloss Lami" onchange="update()">
-                            <option value="0">Gloss Lami: No</option><option value="1">Gloss Lami: Yes</option>
-                        </select>
-                        <select class="f-opt" data-name="Matte Lami" onchange="update()">
-                            <option value="0">Matte Lami: No</option><option value="1">Matte Lami: Yes</option>
-                        </select>
+                    <button type="button" id="addonToggleBtn" onclick="toggleAddons()" style="background:none; border:1px dashed var(--border); color:var(--primary); font-weight:600; font-size:12px; padding:10px 16px; border-radius:8px; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:8px;">
+                        <span id="addonToggleIcon">+</span> Add-on Printing &amp; Finishing <span class="pill-warn" style="margin-left:4px;">TBD pricing</span>
+                    </button>
+                    <div id="addonBody" style="display:none; margin-top:14px;">
+                        <div class="finishing-row">
+                            <div style="grid-column: span 1;">
+                                <select id="pAddon" onchange="update()">
+                                    <option value="0">Add-on Printing: No</option>
+                                    <option value="1">Add-on Printing: Yes</option>
+                                </select>
+                                <input type="number" id="pAddQty" placeholder="Add-on Qty" oninput="update()" style="display:none; margin-top:8px;">
+                            </div>
+                            <select class="f-opt" data-name="Folding" onchange="update()">
+                                <option value="0">Folding: No</option><option value="1">Folding: Yes</option>
+                            </select>
+                            <select class="f-opt" data-name="Matte Paper" onchange="update()">
+                                <option value="0">Matte Paper: No</option><option value="1">Matte Paper: Yes</option>
+                            </select>
+                            <select class="f-opt" data-name="Crease+Fold" onchange="update()">
+                                <option value="0">Crease+Fold: No</option><option value="1">Crease+Fold: Yes</option>
+                            </select>
+                            <select class="f-opt" data-name="Perforation" onchange="update()">
+                                <option value="0">Perforation: No</option><option value="1">Perforation: Yes</option>
+                            </select>
+                            <select class="f-opt" data-name="Gloss Lami" onchange="update()">
+                                <option value="0">Gloss Lami: No</option><option value="1">Gloss Lami: Yes</option>
+                            </select>
+                            <select class="f-opt" data-name="Matte Lami" onchange="update()">
+                                <option value="0">Matte Lami: No</option><option value="1">Matte Lami: Yes</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -893,6 +917,14 @@ function getAhweiCost(){
     return Math.ceil((finalRate/1000)*qty*rounds);
 }
 
+function toggleAddons(){
+    var body=document.getElementById('addonBody');
+    var icon=document.getElementById('addonToggleIcon');
+    var open=body.style.display==='none';
+    body.style.display=open?'block':'none';
+    icon.textContent=open?'−':'+';
+}
+
 function switchTab(name){
     document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===name);});
     document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+name);});
@@ -948,8 +980,12 @@ function update(){
     }
 
     // Add-on print
-    if(document.getElementById('pAddon').value==='1'){
-        var aq=parseInt(document.getElementById('pAddQty').value)||0;
+    var addonOn=document.getElementById('pAddon').value==='1';
+    var addQtyInput=document.getElementById('pAddQty');
+    addQtyInput.style.display=addonOn?'block':'none';
+    if(!addonOn) addQtyInput.value='';
+    if(addonOn){
+        var aq=parseInt(addQtyInput.value)||0;
         if(aq>0){
             var ar=getPrintCost(size,gsm,side,aq);
             if(ar.cost>0){
@@ -1083,10 +1119,14 @@ function update(){
 function resetAll(){
     document.querySelectorAll('input[type="number"]').forEach(function(i){i.value='';});
     document.querySelectorAll('select').forEach(function(s){s.selectedIndex=0;});
+    // Restore defaults
+    document.getElementById('pGsm').value='128';
     document.getElementById('delToggle').checked=false;
     document.getElementById('ahweiToggle').checked=false;
     document.getElementById('ahweiBody').style.display='none';
     document.getElementById('ahweiChevron').classList.remove('open');
+    document.getElementById('addonBody').style.display='none';
+    document.getElementById('addonToggleIcon').textContent='+';
     document.getElementById('hdbMultiRows').innerHTML='';
     document.getElementById('landedMultiRows').innerHTML='';
     document.getElementById('indMultiRows').innerHTML='';
