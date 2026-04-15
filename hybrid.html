@@ -195,20 +195,24 @@
                     <div>
                         <div style="font-weight:700; font-size:11px; color:#e67e22; text-transform:uppercase; margin-bottom:10px;">Inputs</div>
                         <div style="margin-bottom:10px;">
-                            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Ah Wei Cost ($)</label>
-                            <input type="number" id="ahweiCost" placeholder="0" oninput="update()">
+                            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Flyer Size</label>
+                            <select id="ahweiSize" onchange="update()">
+                                <option value="A5">A5</option>
+                                <option value="A4">A4</option>
+                                <option value="A3">A3</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:10px;">
+                            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Paper GSM</label>
+                            <select id="ahweiGsm" onchange="update()">
+                                <option value="128">128gsm</option>
+                                <option value="157">157gsm</option>
+                                <option value="260">260gsm</option>
+                            </select>
                         </div>
                         <div style="margin-bottom:10px;">
                             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Quantity</label>
-                            <input type="number" id="ahweiQty" placeholder="0" oninput="update()">
-                        </div>
-                        <div style="margin-bottom:10px;">
-                            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Our Standard Cost ($ per 1K)</label>
-                            <input type="number" id="ahweiStd" placeholder="e.g. 179" oninput="update()">
-                        </div>
-                        <div style="margin-bottom:10px;">
-                            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px;">Number of Rounds</label>
-                            <input type="number" id="ahweiRounds" value="1" min="1" oninput="update()">
+                            <input type="number" id="ahweiQty" placeholder="e.g. 5000" oninput="update()">
                         </div>
                         <div style="margin-top:14px; padding:12px; background:#f0f7fd; border-radius:6px; text-align:center;">
                             <div style="font-size:11px; font-weight:700; color:#3498db;">AH WEI QUOTE</div>
@@ -730,16 +734,35 @@ function toggleAhwei(e) {
     update();
 }
 
+// Ah Wei reference rates per 1,000 units (tier-based by quantity)
+// [minQty, rate A5, rate A4, rate A3]
+var AHWEI_RATES = {
+    "128": [[1000,179,182,202],[2000,139,147,167],[3000,129,137,157],[4000,109,117,137]],
+    "157": [[1000,181,184,204],[2000,141,149,169],[3000,131,139,159],[4000,111,119,139]],
+    "260": [[1000,185,188,208],[2000,145,153,173],[3000,135,143,163],[4000,115,123,143]]
+};
+
+function getAhweiRate(gsm, size, qty) {
+    var table = AHWEI_RATES[gsm];
+    if (!table) return 0;
+    var sizeIdx = {A5:1, A4:2, A3:3}[size] || 1;
+    // Find the tier: rates apply to qty ranges
+    // 1000-1999, 2000-2999, 3000-3999, 4000+
+    for (var i = table.length - 1; i >= 0; i--) {
+        if (qty >= table[i][0]) return table[i][sizeIdx];
+    }
+    // Below 1000: use 1k tier rate
+    return table[0][sizeIdx];
+}
+
 function getAhweiCost() {
     if (!document.getElementById('ahweiToggle').checked) return 0;
-    var ahwei = parseFloat(document.getElementById('ahweiCost').value) || 0;
+    var size = document.getElementById('ahweiSize').value;
+    var gsm = document.getElementById('ahweiGsm').value;
     var qty = parseFloat(document.getElementById('ahweiQty').value) || 0;
-    var stdCost = parseFloat(document.getElementById('ahweiStd').value) || 0;
-    var rounds = parseFloat(document.getElementById('ahweiRounds').value) || 1;
     if (qty <= 0) return 0;
-    var surcharge = (((ahwei / qty) * 1000) - 35) * 2;
-    var finalRate = stdCost + surcharge;
-    return Math.ceil((finalRate / 1000) * qty * rounds);
+    var rate = getAhweiRate(gsm, size, qty);
+    return Math.ceil((qty / 1000) * rate);
 }
 
 function updateMultiDesigns(section) {
