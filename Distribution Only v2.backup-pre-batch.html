@@ -586,27 +586,13 @@ select {
                 <div class="card-hint">Optional extras</div>
             </div>
             <div class="card-body">
-                <!-- Standard add-ons (HDB / Letterbox / Landed / Industrial) -->
-                <div id="addonStdBlock">
-                    <div class="service-row"><div><div class="service-label">Express Services</div><div class="service-hint">Min $150, per-1K rate by service type</div></div><input type="number" id="addonExpress" placeholder="Qty" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Additional Landmark</div><div class="service-hint">$40 per landmark</div></div><input type="number" id="addonLandmark" placeholder="# landmarks" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Solo Flyer</div><div class="service-hint">Flat $15 per 1,000 (any size/GSM)</div></div><input type="number" id="addonSolo" placeholder="Qty" oninput="update()"></div>
-                    <div style="padding:14px 0 4px;">
-                        <div class="multi-head">Multiple Flyer per Unit</div>
-                        <input type="number" id="addonMultiCount" min="0" max="10" placeholder="Number of designs (0-10)" oninput="updateMultiDesigns()" style="max-width:280px;">
-                        <div id="multiDesignRows" style="margin-top:10px;"></div>
-                    </div>
-                </div>
-                <!-- Walkway-specific add-ons (only shown when Walkway is selected) -->
-                <div id="addonWalkBlock" style="display:none;">
-                    <div class="service-row"><div><div class="service-label">Walkway Standard</div><div class="service-hint">Qty = # of slots</div></div><input type="number" class="walk-add" data-type="walk-std" placeholder="Slots" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Walkway (School)</div></div><input type="number" class="walk-add" data-type="walk-std" placeholder="Slots" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Walkway (Remote Place)</div></div><input type="number" class="walk-add" data-type="walk-remote" placeholder="Slots" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Walkway Selected Date</div></div><input type="number" class="walk-add" data-type="walk-exp" placeholder="Slots" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Walkway Express (Remote)</div></div><input type="number" class="walk-add" data-type="walk-expr" placeholder="Slots" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Walkway Sandwich Board</div></div><input type="number" class="walk-add" data-type="walk-std" placeholder="Slots" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Walkway Backpack</div></div><input type="number" class="walk-add" data-type="walk-std" placeholder="Slots" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Printing Formboard Add-on</div></div><input type="number" class="walk-add" data-type="walk-std" placeholder="Slots" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Express Services</div><div class="service-hint">Min $150, per-1K rate by service type</div></div><input type="number" id="addonExpress" placeholder="Qty" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Additional Landmark</div><div class="service-hint">$40 per landmark</div></div><input type="number" id="addonLandmark" placeholder="# landmarks" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Solo Flyer</div><div class="service-hint">Flat rate by GSM ($15 / $17 / $21)</div></div><input type="number" id="addonSolo" placeholder="Qty" oninput="update()"></div>
+                <div style="padding:14px 0 4px;">
+                    <div class="multi-head">Multiple Flyer per Unit</div>
+                    <input type="number" id="addonMultiCount" min="0" max="10" placeholder="Number of designs (0-10)" oninput="updateMultiDesigns()" style="max-width:280px;">
+                    <div id="multiDesignRows" style="margin-top:10px;"></div>
                 </div>
             </div>
         </div>
@@ -633,17 +619,6 @@ select {
                     </div>
                 </div>
                 <div class="delivery-hint">1-10 cartons = $30 · 11-20 = $40 · 21-30 = $50 · +$10 per additional 10</div>
-            </div>
-        </div>
-
-        <!-- 5. Specs (auto-built quotation text for copy/paste) -->
-        <div class="card">
-            <div class="card-head">
-                <div class="card-title"><span class="card-num">5</span>Specs (Quotation Text)</div>
-                <button type="button" class="btn btn-reset" onclick="copySpecs()" id="copySpecsBtn">Copy</button>
-            </div>
-            <div class="card-body">
-                <textarea id="specsBox" readonly style="width:100%; min-height:160px; padding:14px 16px; font-family:'Inter','Segoe UI',monospace; font-size:13px; line-height:1.6; border:1px solid var(--border); border-radius:8px; background:var(--bg-soft); color:var(--text); resize:vertical; outline:none;"></textarea>
             </div>
         </div>
     </div>
@@ -695,8 +670,7 @@ var HDB_BUTONG={
 var HDB_BUTONG_RATE={"128":{A5:149,A4:157,A3:177},"157":{A5:151,A4:162,A3:182},"260":{A5:155,A4:177,A3:207}};
 
 // Solo Flyer rates per 1,000 (matches original Distribution Only)
-// Solo Flyer: flat $15/1,000 across all sizes & GSMs (Distribution Only)
-var SOLELY={"128":{A5:15,A4:15,A3:15},"157":{A5:15,A4:15,A3:15},"260":{A5:15,A4:15,A3:15}};
+var SOLELY={"128":{A5:15,A4:30},"157":{A5:17,A4:32},"260":{A5:21,A4:36}};
 
 var LANDED={
 "128":[[1000,189,194,229],[2000,213,223,293],[3000,258,284,393],[4000,284,304,444]],
@@ -808,11 +782,6 @@ function switchService(name){
     // Sections 2 and 3 are hidden for condo services
     document.getElementById('section-qty').style.display = isCondo ? 'none' : 'block';
     document.getElementById('section-addon').style.display = isCondo ? 'none' : 'block';
-
-    // Walkway-specific add-on block toggling
-    var isWalkway = (name === 'walkway');
-    document.getElementById('addonStdBlock').style.display = isWalkway ? 'none' : 'block';
-    document.getElementById('addonWalkBlock').style.display = isWalkway ? 'block' : 'none';
 
     if (!isCondo) {
         document.getElementById('hdbSubWrap').style.display = (name==='hdb')?'block':'none';
@@ -958,85 +927,6 @@ function updateMultiDesigns(){
     update();
 }
 
-function buildSpecs(){
-    var size = document.getElementById('calcSize').value;
-    var gsm = document.getElementById('calcGsm').value;
-    var qty = parseFloat(document.getElementById('calcQty').value)||0;
-
-    var lines = [];
-    lines.push('Quotation as per below, for your consideration:');
-    lines.push('');
-    lines.push('Printing of Flyer');
-
-    // Condo branches use their own layout
-    if(currentService === 'condohdr'){
-        var d = CONDO_HDR[currentCondoHdrVariant][currentCondoHdrType];
-        var cqty = parseFloat(document.getElementById('condoHdrQty').value)||0;
-        var r = calcCondoHdr(currentCondoHdrVariant, currentCondoHdrType, cqty);
-        lines.push(d.label + ' (' + d.sub + ')');
-        lines.push((currentCondoHdrVariant==='std'?'Standard':'Enhanced') + ' Condo HDR with envelope & insertion');
-        lines.push('Full colour');
-        lines.push('Based on 1 design (provided by client)');
-        lines.push('QTY: ' + (cqty||'_'));
-        lines.push('');
-        lines.push('Quote: SGD ' + (r.final ? r.final.toFixed(2) : '_'));
-    } else if(currentService === 'condoadmail'){
-        var cqty = parseFloat(document.getElementById('condoAdmailQty').value)||0;
-        var r = calcCondoAdmail(currentCondoAdmailSeason, cqty);
-        var seasonLabel = CONDO_ADMAIL[currentCondoAdmailSeason].label;
-        lines.push(currentCondoAdmailSize + ' Condo Admail');
-        lines.push('Season: ' + seasonLabel);
-        lines.push('Full colour');
-        lines.push('Based on 1 design (provided by client)');
-        lines.push('QTY: ' + (cqty||'_'));
-        lines.push('');
-        lines.push('Quote: SGD ' + (r.final ? r.final.toFixed(2) : '_'));
-    } else {
-        lines.push(size + ' size');
-        lines.push(gsm + 'gsm art paper');
-        lines.push('Full colour');
-        lines.push('Based on 1 design (provided by client)');
-        lines.push('QTY: ' + (qty ? qty.toLocaleString() : '_'));
-        lines.push('');
-        // Service-specific line
-        var svcLine = '';
-        if(currentService === 'hdb'){
-            var sub = {standard:'Standard', estate:'Selected Estate', tong:'Selected Blocks (通)', butong:'Selected Blocks (不通)'}[currentHdbSub];
-            svcLine = 'HDB door to door — ' + sub + ' (spread out from 1 landmark)';
-        } else if(currentService === 'letterbox'){
-            svcLine = 'HDB Letterbox — spread out from 1 landmark';
-        } else if(currentService === 'landed'){
-            svcLine = 'Landed Letterbox — spread out from 1 landmark';
-        } else if(currentService === 'industrial'){
-            svcLine = 'Industrial Letterbox — spread out from 1 landmark';
-        } else if(currentService === 'walkway'){
-            var subW = {standard:'Standard', express:'Express/Selected Date', remote:'Remote Area', remoteexp:'Remote Area Express'}[currentWalkSub];
-            svcLine = 'Walkway — ' + subW + ' (1 slot = 1 manpower 2 hours or assigned flyers, whichever is earlier)';
-        }
-        lines.push(svcLine);
-        // Distribution price (if calculated)
-        var distEl = document.getElementById('estCost');
-        var distVal = distEl ? distEl.textContent : '$0.00';
-        lines.push('Quote: SGD ' + distVal.replace('$',''));
-    }
-
-    document.getElementById('specsBox').value = lines.join('\n');
-}
-
-function copySpecs(){
-    var box = document.getElementById('specsBox');
-    box.select();
-    box.setSelectionRange(0, 99999);
-    try {
-        document.execCommand('copy');
-        var btn = document.getElementById('copySpecsBtn');
-        var orig = btn.textContent;
-        btn.textContent = '✓ Copied!';
-        setTimeout(function(){btn.textContent = orig;}, 1500);
-    } catch(e) {}
-    window.getSelection().removeAllRanges();
-}
-
 function renderSummaryAndDelivery(distH, addonH, hasDist, hasAddon, grandTotal){
     var delH = '';
     var hasDel = false;
@@ -1059,7 +949,6 @@ function renderSummaryAndDelivery(distH, addonH, hasDist, hasAddon, grandTotal){
     document.getElementById('emptyMsg').style.display = (hasDist||hasAddon||hasDel) ? 'none' : 'block';
     grandTotal = Math.round(grandTotal*100)/100;
     document.getElementById('sumGrand').textContent = '$'+grandTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-    buildSpecs();
 }
 
 function update(){
@@ -1156,37 +1045,7 @@ function update(){
         hasDist = true;
     }
 
-    // Walkway-specific add-ons (replaces standard add-ons when walkway active)
-    if(currentService === 'walkway'){
-        document.querySelectorAll('.walk-add').forEach(function(input){
-            var slots = parseFloat(input.value)||0;
-            if(slots <= 0) return;
-            var type = input.dataset.type;
-            var label = input.closest('.service-row').querySelector('.service-label').textContent;
-            // Use Distribution Only's walkway tier tables via getServiceTiersAndRate-equivalent
-            var tableMap = {'walk-std':{tiers:WALK_STD,rate:WALK_STD_RATE},'walk-remote':{tiers:WALK_REMOTE,rate:WALK_REMOTE_RATE},'walk-exp':{tiers:WALK_EXP,rate:WALK_EXP_RATE},'walk-expr':{tiers:WALK_EXPR,rate:WALK_EXPR_RATE}};
-            var info = tableMap[type];
-            if(!info) return;
-            var t = info.tiers[gsm], r = info.rate[gsm];
-            if(!t || !r) return;
-            var sIdx = {A5:1,A4:2,A3:3}[size]||1;
-            var cost = 0;
-            var matched = false;
-            for(var i=0;i<t.length;i++){if(slots===t[i][0]){cost=t[i][sIdx];matched=true;break;}}
-            if(!matched && slots > 4) cost = t[t.length-1][sIdx] + (slots-4)*(r[size]||0);
-            if(cost > 0){
-                cost = Math.round(cost*100)/100;
-                addonH += '<div class="sum-line"><span>'+label+' x'+slots+'</span><b>$'+cost.toFixed(2)+'</b></div>';
-                grandTotal += cost;
-                hasAddon = true;
-            }
-        });
-        if(hasAddon) addonH = '<div class="sum-section-title">Walkway Add-ons</div>' + addonH;
-        renderSummaryAndDelivery(distH, addonH, hasDist, hasAddon, grandTotal);
-        return;
-    }
-
-    // Standard add-ons (HDB / Letterbox / Landed / Industrial)
+    // Add-ons
     var expressQty = parseFloat(document.getElementById('addonExpress').value)||0;
     if(expressQty > 0){
         var svc = currentService;

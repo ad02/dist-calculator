@@ -430,17 +430,6 @@ select {
                 </div>
             </div>
         </div>
-
-        <!-- 4. Specs (auto-built quotation text for copy/paste) -->
-        <div class="card">
-            <div class="card-head">
-                <div class="card-title"><span class="card-num">4</span>Specs (Quotation Text)</div>
-                <button type="button" class="btn btn-reset" onclick="copySpecs()" id="copySpecsBtn">Copy</button>
-            </div>
-            <div class="card-body">
-                <textarea id="specsBox" readonly style="width:100%; min-height:160px; padding:14px 16px; font-family:'Inter','Segoe UI',monospace; font-size:13px; line-height:1.6; border:1px solid var(--border); border-radius:8px; background:var(--bg-soft); color:var(--text); resize:vertical; outline:none; box-sizing:border-box;"></textarea>
-            </div>
-        </div>
     </div>
 
     <!-- Sidebar -->
@@ -604,54 +593,6 @@ function calculateFinal() {
     document.getElementById('finishingBreak').innerHTML = hasFin ? finH : '';
     document.getElementById('emptyMsg').style.display = (hasSel || hasFin) ? 'none' : 'block';
     document.getElementById('grandTotal').innerText = '$' + total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    buildSpecs(total);
-}
-
-function buildSpecs(grandTotal) {
-    var size = document.getElementById('size').value;
-    var weight = document.getElementById('weight').value.replace('GSM', 'gsm');
-    var paperLabel = {
-        '80gsm': '80gsm Simili',
-        '128gsm': '128gsm art paper',
-        '157gsm': '157gsm art paper',
-        '260gsm': '260gsm art card'
-    }[weight] || (weight + ' art paper');
-
-    var lines = [];
-    lines.push('Quotation as per below, for your consideration:');
-    lines.push('');
-    lines.push('Printing of Flyer');
-    lines.push(size + ' size');
-    lines.push(paperLabel);
-    lines.push('Full colour');
-    lines.push('Based on 1 design (provided by client)');
-    lines.push('QTY: ' + (selectedQtyVal ? selectedQtyVal.toLocaleString() : '_'));
-    lines.push('');
-    if (selectedSide === 'Single-Sided') {
-        lines.push('Single sided @ SGD ' + (grandTotal ? grandTotal.toFixed(2) : '_'));
-        lines.push('Double sided @ SGD _');
-    } else if (selectedSide === 'Double-Sided') {
-        lines.push('Single sided @ SGD _');
-        lines.push('Double sided @ SGD ' + (grandTotal ? grandTotal.toFixed(2) : '_'));
-    } else {
-        lines.push('Single sided @ SGD _');
-        lines.push('Double sided @ SGD _');
-    }
-    document.getElementById('specsBox').value = lines.join('\n');
-}
-
-function copySpecs() {
-    var box = document.getElementById('specsBox');
-    box.select();
-    box.setSelectionRange(0, 99999);
-    try {
-        document.execCommand('copy');
-        var btn = document.getElementById('copySpecsBtn');
-        var orig = btn.textContent;
-        btn.textContent = '✓ Copied!';
-        setTimeout(function(){btn.textContent = orig;}, 1500);
-    } catch(e) {}
-    window.getSelection().removeAllRanges();
 }
 
 function resetAll() {
