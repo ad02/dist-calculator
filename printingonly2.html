@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flyer Printing Quotation v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1e40af;
+    --primary-dark: #1e3a8a;
+    --primary-light: #dbeafe;
+    --accent: #10b981;
+    --accent-dark: #059669;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-soft: #f8fafc;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.page {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+}
+
+.page-header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 4px;
+    margin-bottom: -4px;
+}
+.page-title { font-size: 22px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.2px; }
+.page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.btn {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+}
+.btn-reset { background: white; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-reset:hover { background: var(--bg-soft); color: var(--text); }
+
+.card {
+    background: var(--bg-card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.04);
+}
+.card-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card-num {
+    display: inline-flex;
+    width: 24px; height: 24px;
+    background: var(--primary);
+    color: white;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+.card-title { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; }
+.card-hint { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.card-body { padding: 20px; }
+
+label.fld-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 6px;
+}
+input[type="number"], select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+input[type="number"] { font-weight: 600; }
+input[type="number"]:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30,64,175,.1);
+}
+select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%2364748b'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+/* Prominent Size/GSM bar */
+.size-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 2px solid #f59e0b;
+    border-radius: 10px;
+    position: relative;
+}
+.size-bar::before {
+    content: "⚡ Paper Size & Weight";
+    position: absolute;
+    top: -11px;
+    left: 16px;
+    background: #f59e0b;
+    color: white;
+    padding: 3px 12px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+}
+.size-bar .fld-label { color: #78350f; font-weight: 800; }
+.size-bar select { border-color: #f59e0b; font-weight: 700; }
+
+/* Pricing table */
+.price-table-wrap {
+    max-height: 480px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: white;
+}
+.price-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.price-table thead th {
+    position: sticky;
+    top: 0;
+    background: var(--primary-dark);
+    color: white;
+    padding: 12px 14px;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    text-align: center;
+    z-index: 10;
+}
+.price-table thead th:first-child { text-align: left; }
+.price-table td {
+    padding: 10px 14px;
+    text-align: center;
+    border-top: 1px solid #f1f5f9;
+    transition: background .1s;
+}
+.price-table tbody tr:nth-child(even) { background: var(--bg-soft); }
+.qty-cell {
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--primary-light) !important;
+    text-align: left !important;
+    font-size: 13px;
+    width: 120px;
+}
+.price-cell {
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+}
+.price-cell:hover { background: var(--primary-light); color: var(--primary); }
+.price-cell.selected {
+    background: var(--primary) !important;
+    color: white !important;
+    font-weight: 800;
+}
+.click-hint {
+    padding: 10px 14px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Finishing grid */
+.fin-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+.fin-field {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sidebar */
+.sidebar { position: sticky; top: 24px; }
+.summary-card {
+    background: var(--primary-dark);
+    color: white;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 6px 24px rgba(30,58,138,.2);
+}
+.summary-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #93c5fd;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.sum-section { margin-bottom: 16px; }
+.sum-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+}
+.sum-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: #cbd5e1;
+    padding: 3px 0;
+}
+.sum-line span { flex: 1; }
+.sum-line b { color: white; font-weight: 600; white-space: nowrap; }
+.sum-empty {
+    font-size: 12px;
+    color: #64748b;
+    font-style: italic;
+    padding: 4px 0;
+}
+.grand-total-box {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 2px solid rgba(255,255,255,.15);
+    text-align: center;
+}
+.grand-total-label { font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 1.5px; }
+.grand-total-value {
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    margin-top: 4px;
+    letter-spacing: -1px;
+}
+
+.terms {
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: var(--bg-soft);
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+.terms b {
+    color: var(--text);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 1100px) {
+    .page { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .fin-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Flyer Printing Quotation</div>
+            <div class="page-subtitle">Select size, weight, and tier price — then add finishing</div>
+        </div>
+        <button class="btn btn-reset" onclick="resetAll()">Reset All</button>
+    </div>
+
+    <div>
+        <!-- 1. Material & Size -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">1</span>Material &amp; Size</div>
+                <div class="card-hint">Choose paper size and weight</div>
+            </div>
+            <div class="card-body">
+                <div class="size-bar">
+                    <div>
+                        <label class="fld-label">Size</label>
+                        <select id="size" onchange="renderTable()">
+                            <option value="A5">A5 Flyer</option>
+                            <option value="A4">A4 Flyer</option>
+                            <option value="A3">A3 Flyer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="fld-label">Paper Material</label>
+                        <select id="weight" onchange="renderTable()">
+                            <option value="80GSM">80GSM (Simili)</option>
+                            <option value="128GSM" selected>128GSM (Art Paper)</option>
+                            <option value="157GSM">157GSM (Art Paper)</option>
+                            <option value="260GSM">260GSM (Art Card)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Pricing Table -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">2</span>Pricing Tiers</div>
+                <div class="card-hint">Click a price to select quantity &amp; side</div>
+            </div>
+            <div class="card-body">
+                <div class="price-table-wrap">
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Single-Sided</th>
+                                <th>Double-Sided</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <div class="click-hint">👆 Click any price cell above to select that tier</div>
+            </div>
+        </div>
+
+        <!-- 3. Finishing -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><span class="card-num">3</span>Finishing Surcharges</div>
+                <div class="card-hint">Optional extras</div>
+            </div>
+            <div class="card-body">
+                <div class="fin-grid">
+                    <div class="fin-field">
+                        <label class="fld-label">Require Folding?</label>
+                        <select id="requireFolding" onchange="calculateFinal()">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (Auto-add)</option>
+                        </select>
+                    </div>
+                    <div class="fin-field">
+                        <label class="fld-label">Matte Paper?</label>
+                        <select id="mattePaper" onchange="calculateFinal()">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (+10%)</option>
+                        </select>
+                    </div>
+                    <div class="fin-field">
+                        <label class="fld-label">Creasing ($)</label>
+                        <input type="number" id="crease" class="extra-fee" value="" placeholder="0" oninput="calculateFinal()">
+                    </div>
+                    <div class="fin-field">
+                        <label class="fld-label">Perforation ($)</label>
+                        <input type="number" id="perf" class="extra-fee" value="" placeholder="0" oninput="calculateFinal()">
+                    </div>
+                    <div class="fin-field">
+                        <label class="fld-label">Matte Lam ($)</label>
+                        <input type="number" id="lam" class="extra-fee" value="" placeholder="0" oninput="calculateFinal()">
+                    </div>
+                </div>
+                <div class="terms">
+                    <b>Terms &amp; Conditions for Folding</b>
+                    1. For 80gsm, 100gsm, 128gsm, 157gsm art paper only.<br>
+                    2. Offer limited to A3, A4, A5 &amp; A6 size only.<br>
+                    3. Not applicable for Matte Paper.<br>
+                    4. A4 &amp; A3: Max 100K pcs. A5: Max 200K pcs.<br>
+                    5. Any 1 fold or 2 fold only: Half (F1), Cross (F2), Gate (F5), Letter (F7), Accordion (F8), Double Parallel (F6).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="summary-card">
+            <div class="summary-title">Quotation Summary</div>
+            <div id="selectionBreak" class="sum-section"></div>
+            <div id="finishingBreak" class="sum-section"></div>
+            <div id="emptyMsg" class="sum-empty">Click a price cell to start your quote…</div>
+            <div class="grand-total-box">
+                <span class="grand-total-label">GRAND TOTAL</span>
+                <span class="grand-total-value" id="grandTotal">$0.00</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const offsetData = {
+    "A5": {
+        "80GSM": [{ "q": "600", "ss": 129, "ds": 163 }, { "q": "1K", "ss": 139, "ds": 173 }, { "q": "2K", "ss": 149, "ds": 183 }, { "q": "4K", "ss": 159, "ds": 193 }, { "q": "6K", "ss": 189, "ds": 273 }, { "q": "8K", "ss": 246, "ds": 283 }, { "q": "10K", "ss": 276, "ds": 304 }, { "q": "12K", "ss": 304, "ds": 336 }, { "q": "14K", "ss": 331, "ds": 368 }, { "q": "16K", "ss": 359, "ds": 399 }, { "q": "18K", "ss": 372, "ds": 416 }, { "q": "20K", "ss": 385, "ds": 430 }, { "q": "24K", "ss": 429, "ds": 478 }, { "q": "28K", "ss": 491, "ds": 545 }, { "q": "32K", "ss": 555, "ds": 622 }, { "q": "36K", "ss": 618, "ds": 693 }, { "q": "40K", "ss": 680, "ds": 762 }, { "q": "48K", "ss": 808, "ds": 906 }, { "q": "56K", "ss": 933, "ds": 1046 }, { "q": "60K", "ss": 990, "ds": 1110 }, { "q": "64K", "ss": 1046, "ds": 1172 }, { "q": "72K", "ss": 1165, "ds": 1305 }, { "q": "80K", "ss": 1282, "ds": 1436 }, { "q": "88K", "ss": 1396, "ds": 1564 }, { "q": "90K", "ss": 1413, "ds": 1584 }, { "q": "96K", "ss": 1493, "ds": 1673 }, { "q": "100K", "ss": 1539, "ds": 1725 }, { "q": "104K", "ss": 1585, "ds": 1776 }, { "q": "112K", "ss": 1690, "ds": 1894 }, { "q": "120K", "ss": 1793, "ds": 2009 }, { "q": "128K", "ss": 1894, "ds": 2122 }, { "q": "136K", "ss": 1992, "ds": 2232 }, { "q": "140K", "ss": 2030, "ds": 2275 }, { "q": "144K", "ss": 2068, "ds": 2317 }, { "q": "152K", "ss": 2161, "ds": 2421 }, { "q": "160K", "ss": 2252, "ds": 2524 }, { "q": "168K", "ss": 2341, "ds": 2624 }, { "q": "176K", "ss": 2428, "ds": 2721 }, { "q": "180K", "ss": 2459, "ds": 2756 }, { "q": "184K", "ss": 2489, "ds": 2789 }, { "q": "192K", "ss": 2571, "ds": 2881 }, { "q": "200K", "ss": 2652, "ds": 2972 }],
+        "128GSM": [{ "q": "600", "ss": 153, "ds": 183 }, { "q": "1K", "ss": 163, "ds": 193 }, { "q": "2K", "ss": 173, "ds": 223 }, { "q": "4K", "ss": 183, "ds": 243 }, { "q": "6K", "ss": 223, "ds": 283 }, { "q": "8K", "ss": 258, "ds": 304 }, { "q": "10K", "ss": 314, "ds": 343 }, { "q": "12K", "ss": 350, "ds": 381 }, { "q": "14K", "ss": 385, "ds": 418 }, { "q": "16K", "ss": 420, "ds": 456 }, { "q": "18K", "ss": 435, "ds": 475 }, { "q": "20K", "ss": 463, "ds": 512 }, { "q": "24K", "ss": 550, "ds": 608 }, { "q": "28K", "ss": 636, "ds": 702 }, { "q": "32K", "ss": 719, "ds": 794 }, { "q": "36K", "ss": 801, "ds": 885 }, { "q": "40K", "ss": 882, "ds": 974 }, { "q": "48K", "ss": 1047, "ds": 1157 }, { "q": "56K", "ss": 1210, "ds": 1336 }, { "q": "60K", "ss": 1283, "ds": 1417 }, { "q": "64K", "ss": 1355, "ds": 1497 }, { "q": "72K", "ss": 1510, "ds": 1667 }, { "q": "80K", "ss": 1661, "ds": 1834 }, { "q": "88K", "ss": 1809, "ds": 1998 }, { "q": "90K", "ss": 1832, "ds": 2023 }, { "q": "96K", "ss": 1935, "ds": 2136 }, { "q": "100K", "ss": 1995, "ds": 2203 }, { "q": "104K", "ss": 2054, "ds": 2269 }, { "q": "112K", "ss": 2191, "ds": 2419 }, { "q": "120K", "ss": 2324, "ds": 2566 }, { "q": "128K", "ss": 2454, "ds": 2710 }, { "q": "136K", "ss": 2582, "ds": 2851 }, { "q": "140K", "ss": 2631, "ds": 2906 }, { "q": "144K", "ss": 2680, "ds": 2959 }, { "q": "152K", "ss": 2801, "ds": 3093 }, { "q": "160K", "ss": 2919, "ds": 3223 }, { "q": "168K", "ss": 3034, "ds": 3351 }, { "q": "176K", "ss": 3147, "ds": 3476 }, { "q": "180K", "ss": 3187, "ds": 3520 }, { "q": "184K", "ss": 3226, "ds": 3562 }, { "q": "192K", "ss": 3333, "ds": 3680 }, { "q": "200K", "ss": 3437, "ds": 3796 }],
+        "157GSM": [{ "q": "600", "ss": 185, "ds": 221 }, { "q": "1K", "ss": 195, "ds": 231 }, { "q": "2K", "ss": 207, "ds": 267 }, { "q": "4K", "ss": 219, "ds": 291 }, { "q": "6K", "ss": 267, "ds": 336 }, { "q": "8K", "ss": 310, "ds": 363 }, { "q": "10K", "ss": 339, "ds": 369 }, { "q": "12K", "ss": 376, "ds": 409 }, { "q": "14K", "ss": 412, "ds": 451 }, { "q": "16K", "ss": 449, "ds": 491 }, { "q": "18K", "ss": 494, "ds": 535 }, { "q": "20K", "ss": 544, "ds": 589 }, { "q": "24K", "ss": 646, "ds": 699 }, { "q": "28K", "ss": 746, "ds": 808 }, { "q": "32K", "ss": 844, "ds": 914 }, { "q": "36K", "ss": 940, "ds": 1018 }, { "q": "40K", "ss": 1034, "ds": 1120 }, { "q": "48K", "ss": 1229, "ds": 1331 }, { "q": "56K", "ss": 1420, "ds": 1538 }, { "q": "60K", "ss": 1506, "ds": 1631 }, { "q": "64K", "ss": 1590, "ds": 1723 }, { "q": "72K", "ss": 1771, "ds": 1919 }, { "q": "80K", "ss": 1949, "ds": 2111 }, { "q": "88K", "ss": 2122, "ds": 2299 }, { "q": "90K", "ss": 2149, "ds": 2328 }, { "q": "96K", "ss": 2270, "ds": 2458 }, { "q": "100K", "ss": 2341, "ds": 2535 }, { "q": "104K", "ss": 2410, "ds": 2611 }, { "q": "112K", "ss": 2570, "ds": 2784 }, { "q": "120K", "ss": 2726, "ds": 2953 }, { "q": "128K", "ss": 2879, "ds": 3119 }, { "q": "136K", "ss": 3029, "ds": 3281 }, { "q": "140K", "ss": 3087, "ds": 3344 }, { "q": "144K", "ss": 3144, "ds": 3405 }, { "q": "152K", "ss": 3286, "ds": 3559 }, { "q": "160K", "ss": 3425, "ds": 3709 }, { "q": "168K", "ss": 3560, "ds": 3856 }, { "q": "176K", "ss": 3693, "ds": 4000 }, { "q": "180K", "ss": 3739, "ds": 4050 }, { "q": "184K", "ss": 3785, "ds": 4099 }, { "q": "192K", "ss": 3910, "ds": 4235 }, { "q": "200K", "ss": 4033, "ds": 4368 }],
+        "260GSM": [{ "q": "600", "ss": 206, "ds": 232 }, { "q": "1K", "ss": 213, "ds": 241 }, { "q": "2K", "ss": 252, "ds": 272 }, { "q": "3K", "ss": 270, "ds": 306 }, { "q": "4K", "ss": 300, "ds": 338 }, { "q": "5K", "ss": 333, "ds": 369 }, { "q": "6K", "ss": 376, "ds": 410 }, { "q": "7K", "ss": 416, "ds": 442 }, { "q": "8K", "ss": 455, "ds": 472 }, { "q": "9K", "ss": 495, "ds": 513 }, { "q": "10K", "ss": 535, "ds": 554 }, { "q": "12K", "ss": 594, "ds": 619 }, { "q": "14K", "ss": 671, "ds": 701 }, { "q": "16K", "ss": 749, "ds": 783 }, { "q": "18K", "ss": 827, "ds": 865 }, { "q": "20K", "ss": 904, "ds": 947 }, { "q": "24K", "ss": 1066, "ds": 1132 }, { "q": "28K", "ss": 1206, "ds": 1292 }, { "q": "32K", "ss": 1348, "ds": 1453 }, { "q": "36K", "ss": 1490, "ds": 1613 }, { "q": "40K", "ss": 1631, "ds": 1773 }]
+    },
+    "A4": {
+        "80GSM": [{ "q": "300", "ss": 119, "ds": 153 }, { "q": "500", "ss": 129, "ds": 163 }, { "q": "1K", "ss": 149, "ds": 183 }, { "q": "2K", "ss": 159, "ds": 193 }, { "q": "3K", "ss": 178, "ds": 238 }, { "q": "4K", "ss": 196, "ds": 283 }, { "q": "5K", "ss": 225, "ds": 302 }, { "q": "6K", "ss": 264, "ds": 297 }, { "q": "7K", "ss": 305, "ds": 343 }, { "q": "8K", "ss": 328, "ds": 369 }, { "q": "9K", "ss": 351, "ds": 396 }, { "q": "10K", "ss": 374, "ds": 423 }, { "q": "12K", "ss": 429, "ds": 478 }, { "q": "14K", "ss": 486, "ds": 545 }, { "q": "16K", "ss": 550, "ds": 620 }, { "q": "18K", "ss": 612, "ds": 690 }, { "q": "20K", "ss": 674, "ds": 760 }, { "q": "24K", "ss": 800, "ds": 902 }, { "q": "28K", "ss": 924, "ds": 1042 }, { "q": "30K", "ss": 981, "ds": 1106 }, { "q": "32K", "ss": 1036, "ds": 1168 }, { "q": "36K", "ss": 1154, "ds": 1301 }, { "q": "40K", "ss": 1269, "ds": 1431 }, { "q": "44K", "ss": 1382, "ds": 1559 }, { "q": "48K", "ss": 1493, "ds": 1683 }, { "q": "50K", "ss": 1540, "ds": 1736 }, { "q": "52K", "ss": 1585, "ds": 1788 }, { "q": "56K", "ss": 1690, "ds": 1906 }, { "q": "60K", "ss": 1793, "ds": 2022 }, { "q": "64K", "ss": 1894, "ds": 2136 }, { "q": "68K", "ss": 1992, "ds": 2247 }, { "q": "70K", "ss": 2031, "ds": 2290 }, { "q": "72K", "ss": 2068, "ds": 2332 }, { "q": "76K", "ss": 2161, "ds": 2437 }, { "q": "80K", "ss": 2252, "ds": 2540 }, { "q": "84K", "ss": 2342, "ds": 2640 }, { "q": "88K", "ss": 2429, "ds": 2739 }, { "q": "90K", "ss": 2459, "ds": 2773 }, { "q": "92K", "ss": 2489, "ds": 2807 }, { "q": "94K", "ss": 2518, "ds": 2840 }, { "q": "96K", "ss": 2546, "ds": 2871 }, { "q": "100K", "ss": 2626, "ds": 2961 }, { "q": "104K", "ss": 2704, "ds": 3049 }, { "q": "112K", "ss": 2883, "ds": 3251 }, { "q": "120K", "ss": 3059, "ds": 3449 }, { "q": "128K", "ss": 3230, "ds": 3643 }, { "q": "136K", "ss": 3398, "ds": 3832 }, { "q": "140K", "ss": 3463, "ds": 3905 }, { "q": "144K", "ss": 3527, "ds": 3977 }, { "q": "152K", "ss": 3686, "ds": 4157 }, { "q": "160K", "ss": 3852, "ds": 4346 }, { "q": "168K", "ss": 4017, "ds": 4536 }, { "q": "176K", "ss": 4183, "ds": 4726 }, { "q": "180K", "ss": 4266, "ds": 4821 }, { "q": "184K", "ss": 4348, "ds": 4916 }, { "q": "192K", "ss": 4514, "ds": 5105 }, { "q": "200K", "ss": 4680, "ds": 5295 }],
+        "128GSM": [{ "q": "300", "ss": 153, "ds": 203 }, { "q": "500", "ss": 163, "ds": 213 }, { "q": "1K", "ss": 173, "ds": 223 }, { "q": "2K", "ss": 183, "ds": 243 }, { "q": "3K", "ss": 221, "ds": 273 }, { "q": "4K", "ss": 259, "ds": 303 }, { "q": "5K", "ss": 306, "ds": 346 }, { "q": "6K", "ss": 353, "ds": 389 }, { "q": "7K", "ss": 371, "ds": 403 }, { "q": "8K", "ss": 408, "ds": 448 }, { "q": "9K", "ss": 454, "ds": 499 }, { "q": "10K", "ss": 500, "ds": 549 }, { "q": "12K", "ss": 594, "ds": 652 }, { "q": "14K", "ss": 686, "ds": 753 }, { "q": "16K", "ss": 776, "ds": 852 }, { "q": "18K", "ss": 864, "ds": 949 }, { "q": "20K", "ss": 951, "ds": 1044 }, { "q": "24K", "ss": 1129, "ds": 1241 }, { "q": "28K", "ss": 1305, "ds": 1433 }, { "q": "30K", "ss": 1384, "ds": 1521 }, { "q": "32K", "ss": 1462, "ds": 1606 }, { "q": "36K", "ss": 1628, "ds": 1789 }, { "q": "40K", "ss": 1791, "ds": 1968 }, { "q": "44K", "ss": 1951, "ds": 2143 }, { "q": "45K", "ss": 1995, "ds": 2191 }, { "q": "50K", "ss": 2173, "ds": 2387 }, { "q": "52K", "ss": 2238, "ds": 2458 }, { "q": "56K", "ss": 2386, "ds": 2621 }, { "q": "60K", "ss": 2531, "ds": 2781 }, { "q": "64K", "ss": 2673, "ds": 2937 }, { "q": "68K", "ss": 2812, "ds": 3089 }, { "q": "70K", "ss": 2866, "ds": 3149 }, { "q": "72K", "ss": 2919, "ds": 3207 }, { "q": "76K", "ss": 3050, "ds": 3351 }, { "q": "80K", "ss": 3179, "ds": 3493 }, { "q": "84K", "ss": 3305, "ds": 3631 }, { "q": "88K", "ss": 3428, "ds": 3766 }, { "q": "90K", "ss": 3471, "ds": 3814 }, { "q": "92K", "ss": 3513, "ds": 3860 }, { "q": "96K", "ss": 3554, "ds": 3905 }, { "q": "100K", "ss": 3594, "ds": 3948 }, { "q": "104K", "ss": 3706, "ds": 4072 }, { "q": "112K", "ss": 3816, "ds": 4193 }, { "q": "120K", "ss": 4069, "ds": 4471 }, { "q": "128K", "ss": 4317, "ds": 4743 }, { "q": "136K", "ss": 4559, "ds": 5009 }, { "q": "140K", "ss": 4693, "ds": 5156 }, { "q": "144K", "ss": 4888, "ds": 5371 }, { "q": "152K", "ss": 4978, "ds": 5469 }, { "q": "160K", "ss": 5203, "ds": 5716 }, { "q": "168K", "ss": 5457, "ds": 5995 }, { "q": "176K", "ss": 5716, "ds": 6281 }, { "q": "180K", "ss": 5847, "ds": 6424 }, { "q": "184K", "ss": 5921, "ds": 6505 }, { "q": "192K", "ss": 5992, "ds": 6584 }, { "q": "200K", "ss": 6219, "ds": 6835 }],
+        "157GSM": [{ "q": "300", "ss": 188, "ds": 217 }, { "q": "500", "ss": 190, "ds": 225 }, { "q": "1K", "ss": 206, "ds": 234 }, { "q": "2K", "ss": 227, "ds": 268 }, { "q": "3K", "ss": 260, "ds": 303 }, { "q": "4K", "ss": 294, "ds": 337 }, { "q": "5K", "ss": 325, "ds": 373 }, { "q": "6K", "ss": 365, "ds": 417 }, { "q": "7K", "ss": 421, "ds": 457 }, { "q": "8K", "ss": 477, "ds": 517 }, { "q": "9K", "ss": 531, "ds": 576 }, { "q": "10K", "ss": 584, "ds": 633 }, { "q": "12K", "ss": 694, "ds": 753 }, { "q": "14K", "ss": 802, "ds": 869 }, { "q": "16K", "ss": 907, "ds": 984 }, { "q": "18K", "ss": 1010, "ds": 1096 }, { "q": "20K", "ss": 1111, "ds": 2205 }, { "q": "24K", "ss": 1321, "ds": 1432 }, { "q": "28K", "ss": 1525, "ds": 1654 }, { "q": "30K", "ss": 1618, "ds": 1755 }, { "q": "32K", "ss": 1709, "ds": 1853 }, { "q": "36K", "ss": 1904, "ds": 2064 }, { "q": "40K", "ss": 2094, "ds": 2271 }, { "q": "44K", "ss": 2281, "ds": 2473 }, { "q": "45K", "ss": 2332, "ds": 2529 }, { "q": "50K", "ss": 2541, "ds": 2755 }, { "q": "52K", "ss": 2616, "ds": 2837 }, { "q": "56K", "ss": 2789, "ds": 3025 }, { "q": "60K", "ss": 2959, "ds": 3209 }, { "q": "64K", "ss": 3125, "ds": 3389 }, { "q": "68K", "ss": 3288, "ds": 3565 }, { "q": "70K", "ss": 3351, "ds": 3634 }, { "q": "72K", "ss": 3412, "ds": 3700 }, { "q": "76K", "ss": 3566, "ds": 3867 }, { "q": "80K", "ss": 3717, "ds": 4031 }, { "q": "84K", "ss": 3864, "ds": 4190 }, { "q": "88K", "ss": 4008, "ds": 4346 }, { "q": "90K", "ss": 4058, "ds": 4401 }, { "q": "92K", "ss": 4108, "ds": 4454 }, { "q": "96K", "ss": 4155, "ds": 4506 }, { "q": "100K", "ss": 4202, "ds": 4556 }, { "q": "104K", "ss": 4333, "ds": 4699 }, { "q": "112K", "ss": 4462, "ds": 4839 }, { "q": "120K", "ss": 4758, "ds": 5160 }, { "q": "128K", "ss": 5047, "ds": 5473 }, { "q": "136K", "ss": 5330, "ds": 5780 }, { "q": "140K", "ss": 5487, "ds": 5950 }, { "q": "144K", "ss": 5715, "ds": 6198 }, { "q": "152K", "ss": 5820, "ds": 6312 }, { "q": "160K", "ss": 6083, "ds": 6596 }, { "q": "168K", "ss": 6380, "ds": 6919 }, { "q": "176K", "ss": 6684, "ds": 7248 }, { "q": "180K", "ss": 6836, "ds": 7413 }, { "q": "184K", "ss": 6922, "ds": 7507 }, { "q": "192K", "ss": 7006, "ds": 7598 }, { "q": "200K", "ss": 7275, "ds": 7891 }],
+        "260GSM": [{ "q": "300", "ss": 211, "ds": 236 }, { "q": "500", "ss": 216, "ds": 243 }, { "q": "1K", "ss": 255, "ds": 267 }, { "q": "2K", "ss": 297, "ds": 342 }, { "q": "3K", "ss": 368, "ds": 403 }, { "q": "4K", "ss": 449, "ds": 461 }, { "q": "5K", "ss": 516, "ds": 537 }, { "q": "6K", "ss": 594, "ds": 619 }, { "q": "7K", "ss": 671, "ds": 701 }, { "q": "8K", "ss": 749, "ds": 783 }, { "q": "9K", "ss": 827, "ds": 865 }, { "q": "10K", "ss": 904, "ds": 947 }, { "q": "12K", "ss": 1066, "ds": 1132 }, { "q": "14K", "ss": 1206, "ds": 1292 }, { "q": "16K", "ss": 1348, "ds": 1453 }, { "q": "18K", "ss": 1490, "ds": 1613 }, { "q": "20K", "ss": 1631, "ds": 1773 }]
+    },
+    "A3": {
+        "80GSM": [{ "q": "300", "ss": 169, "ds": 211 }, { "q": "500", "ss": 172, "ds": 216 }, { "q": "1K", "ss": 187, "ds": 232 }, { "q": "2K", "ss": 218, "ds": 270 }, { "q": "3K", "ss": 251, "ds": 313 }, { "q": "4K", "ss": 285, "ds": 356 }, { "q": "5K", "ss": 323, "ds": 390 }, { "q": "6K", "ss": 359, "ds": 431 }, { "q": "7K", "ss": 396, "ds": 473 }, { "q": "8K", "ss": 432, "ds": 514 }, { "q": "9K", "ss": 463, "ds": 551 }, { "q": "10K", "ss": 493, "ds": 588 }, { "q": "12K", "ss": 566, "ds": 682 }, { "q": "16K", "ss": 736, "ds": 861 }, { "q": "20K", "ss": 915, "ds": 1035 }, { "q": "24K", "ss": 1093, "ds": 1235 }, { "q": "28K", "ss": 1268, "ds": 1434 }, { "q": "30K", "ss": 1352, "ds": 1529 }, { "q": "32K", "ss": 1435, "ds": 1623 }, { "q": "36K", "ss": 1607, "ds": 1816 }, { "q": "40K", "ss": 1776, "ds": 2008 }, { "q": "44K", "ss": 1944, "ds": 2198 }, { "q": "48K", "ss": 2110, "ds": 2386 }, { "q": "50K", "ss": 2187, "ds": 2473 }, { "q": "52K", "ss": 2263, "ds": 2559 }, { "q": "56K", "ss": 2425, "ds": 2742 }, { "q": "60K", "ss": 2586, "ds": 2923 }, { "q": "64K", "ss": 2744, "ds": 3103 }, { "q": "68K", "ss": 2901, "ds": 3280 }, { "q": "70K", "ss": 2972, "ds": 3360 }, { "q": "72K", "ss": 3042, "ds": 3439 }, { "q": "76K", "ss": 3195, "ds": 3612 }, { "q": "80K", "ss": 3343, "ds": 3783 }, { "q": "84K", "ss": 3493, "ds": 3952 }, { "q": "88K", "ss": 3641, "ds": 4120 }, { "q": "90K", "ss": 3705, "ds": 4193 }, { "q": "92K", "ss": 3769, "ds": 4264 }, { "q": "96K", "ss": 3913, "ds": 4428 }, { "q": "100K", "ss": 4056, "ds": 4589 }],
+        "128GSM": [{ "q": "300", "ss": 175, "ds": 222 }, { "q": "500", "ss": 179, "ds": 225 }, { "q": "1K", "ss": 201, "ds": 252 }, { "q": "2K", "ss": 242, "ds": 299 }, { "q": "3K", "ss": 292, "ds": 348 }, { "q": "4K", "ss": 342, "ds": 397 }, { "q": "5K", "ss": 394, "ds": 457 }, { "q": "6K", "ss": 449, "ds": 510 }, { "q": "7K", "ss": 506, "ds": 562 }, { "q": "8K", "ss": 561, "ds": 615 }, { "q": "9K", "ss": 609, "ds": 677 }, { "q": "10K", "ss": 644, "ds": 737 }, { "q": "12K", "ss": 748, "ds": 847 }, { "q": "16K", "ss": 977, "ds": 1074 }, { "q": "20K", "ss": 1215, "ds": 1335 }, { "q": "24K", "ss": 1451, "ds": 1594 }, { "q": "28K", "ss": 1684, "ds": 1851 }, { "q": "30K", "ss": 1796, "ds": 1973 }, { "q": "32K", "ss": 1906, "ds": 2094 }, { "q": "36K", "ss": 2133, "ds": 2344 }, { "q": "40K", "ss": 2359, "ds": 2592 }, { "q": "44K", "ss": 2581, "ds": 2837 }, { "q": "48K", "ss": 2802, "ds": 3079 }, { "q": "50K", "ss": 2904, "ds": 3192 }, { "q": "52K", "ss": 3005, "ds": 3303 }, { "q": "56K", "ss": 3221, "ds": 3539 }, { "q": "60K", "ss": 3433, "ds": 3773 }, { "q": "64K", "ss": 3644, "ds": 4005 }, { "q": "68K", "ss": 3853, "ds": 4234 }, { "q": "70K", "ss": 3946, "ds": 4337 }, { "q": "72K", "ss": 4039, "ds": 4439 }, { "q": "76K", "ss": 4242, "ds": 4662 }, { "q": "80K", "ss": 4443, "ds": 4883 }, { "q": "84K", "ss": 4642, "ds": 5101 }, { "q": "88K", "ss": 4839, "ds": 5318 }, { "q": "90K", "ss": 4924, "ds": 5412 }, { "q": "92K", "ss": 5009, "ds": 5504 }, { "q": "96K", "ss": 5200, "ds": 5715 }, { "q": "100K", "ss": 5390, "ds": 5924 }],
+        "157GSM": [{ "q": "300", "ss": 181, "ds": 227 }, { "q": "500", "ss": 185, "ds": 229 }, { "q": "1K", "ss": 211, "ds": 259 }, { "q": "2K", "ss": 265, "ds": 322 }, { "q": "3K", "ss": 322, "ds": 373 }, { "q": "4K", "ss": 378, "ds": 424 }, { "q": "5K", "ss": 441, "ds": 493 }, { "q": "6K", "ss": 499, "ds": 568 }, { "q": "7K", "ss": 558, "ds": 643 }, { "q": "8K", "ss": 616, "ds": 717 }, { "q": "9K", "ss": 677, "ds": 762 }, { "q": "10K", "ss": 737, "ds": 807 }, { "q": "12K", "ss": 861, "ds": 939 }, { "q": "16K", "ss": 1143, "ds": 1239 }, { "q": "20K", "ss": 1421, "ds": 1542 }, { "q": "24K", "ss": 1697, "ds": 1841 }, { "q": "28K", "ss": 1970, "ds": 2137 }, { "q": "30K", "ss": 2100, "ds": 2278 }, { "q": "32K", "ss": 2229, "ds": 2418 }, { "q": "36K", "ss": 2495, "ds": 2707 }, { "q": "40K", "ss": 2759, "ds": 2992 }, { "q": "44K", "ss": 3020, "ds": 3275 }, { "q": "48K", "ss": 3278, "ds": 3555 }, { "q": "50K", "ss": 3397, "ds": 3685 }, { "q": "52K", "ss": 3516, "ds": 3813 }, { "q": "56K", "ss": 3767, "ds": 4086 }, { "q": "60K", "ss": 4016, "ds": 4356 }, { "q": "64K", "ss": 4263, "ds": 4624 }, { "q": "68K", "ss": 4507, "ds": 4888 }, { "q": "70K", "ss": 4616, "ds": 5007 }, { "q": "72K", "ss": 4725, "ds": 5124 }, { "q": "76K", "ss": 4962, "ds": 5382 }, { "q": "80K", "ss": 5197, "ds": 5637 }, { "q": "84K", "ss": 5430, "ds": 5890 }, { "q": "88K", "ss": 5660, "ds": 6139 }, { "q": "90K", "ss": 5760, "ds": 6248 }, { "q": "92K", "ss": 5859, "ds": 6355 }, { "q": "96K", "ss": 6083, "ds": 6598 }, { "q": "100K", "ss": 6305, "ds": 6839 }],
+        "260GSM": [{ "q": "300", "ss": 197, "ds": 385 }, { "q": "500", "ss": 208, "ds": 413 }, { "q": "1K", "ss": 245, "ds": 495 }, { "q": "2K", "ss": 321, "ds": 663 }, { "q": "3K", "ss": 417, "ds": 871 }, { "q": "4K", "ss": 514, "ds": 1116 }, { "q": "5K", "ss": 633, "ds": 1377 }, { "q": "6K", "ss": 514, "ds": 1116 }]
+    }
+};
+
+// Fix A3 260GSM (original has 12 rows)
+offsetData.A3["260GSM"] = [{ "q": "300", "ss": 197, "ds": 385 }, { "q": "500", "ss": 208, "ds": 413 }, { "q": "1K", "ss": 245, "ds": 495 }, { "q": "2K", "ss": 321, "ds": 663 }, { "q": "3K", "ss": 417, "ds": 871 }, { "q": "4K", "ss": 514, "ds": 1116 }, { "q": "5K", "ss": 633, "ds": 1377 }, { "q": "6K", "ss": 736, "ds": 1626 }, { "q": "7K", "ss": 830, "ds": 1855 }, { "q": "8K", "ss": 924, "ds": 2085 }, { "q": "9K", "ss": 1019, "ds": 2314 }, { "q": "10K", "ss": 1113, "ds": 2543 }];
+
+let basePrice = 0;
+let selectedQtyVal = 0;
+let selectedQtyLabel = '';
+let selectedSide = '';
+
+function parseQty(qStr) {
+    if (qStr.toUpperCase().includes("K")) {
+        return parseFloat(qStr.toUpperCase().replace("K", "")) * 1000;
+    }
+    return parseFloat(qStr);
+}
+
+function calculateFoldingFee(qty) {
+    if (qty <= 0) return 0;
+    if (qty <= 5000) return 30;
+    if (qty < 10000) return 40;
+    return 50 + Math.max(Math.ceil((qty - 10000) / 1000), 0);
+}
+
+function renderTable() {
+    const size = document.getElementById('size').value;
+    const weight = document.getElementById('weight').value;
+    const body = document.getElementById('tableBody');
+    const dataList = offsetData[size][weight];
+
+    body.innerHTML = "";
+    dataList.forEach(function(item, index) {
+        const row = document.createElement('tr');
+
+        const qCell = document.createElement('td');
+        qCell.className = 'qty-cell';
+        qCell.innerText = item.q;
+        row.appendChild(qCell);
+
+        const ssCell = document.createElement('td');
+        ssCell.className = 'price-cell';
+        ssCell.innerText = '$' + item.ss.toLocaleString();
+        ssCell.onclick = function() { selectPrice(item.ss, item.q, 'Single-Sided', this); };
+        row.appendChild(ssCell);
+
+        const dsCell = document.createElement('td');
+        dsCell.className = 'price-cell';
+        dsCell.innerText = '$' + item.ds.toLocaleString();
+        dsCell.onclick = function() { selectPrice(item.ds, item.q, 'Double-Sided', this); };
+        row.appendChild(dsCell);
+
+        body.appendChild(row);
+        if (index === 0) selectPrice(item.ss, item.q, 'Single-Sided', ssCell);
+    });
+}
+
+function selectPrice(val, qStr, side, element) {
+    document.querySelectorAll('.price-cell').forEach(function(c) { c.classList.remove('selected'); });
+    element.classList.add('selected');
+    basePrice = val;
+    selectedQtyVal = parseQty(qStr);
+    selectedQtyLabel = qStr;
+    selectedSide = side;
+    calculateFinal();
+}
+
+function calculateFinal() {
+    const size = document.getElementById('size').value;
+    const weight = document.getElementById('weight').value;
+
+    let extraFees = 0;
+    const crease = parseFloat(document.getElementById('crease').value) || 0;
+    const perf = parseFloat(document.getElementById('perf').value) || 0;
+    const lam = parseFloat(document.getElementById('lam').value) || 0;
+    extraFees = crease + perf + lam;
+
+    let folding = 0;
+    const foldOn = document.getElementById('requireFolding').value === 'yes';
+    if (foldOn) folding = calculateFoldingFee(selectedQtyVal);
+
+    const matteOn = document.getElementById('mattePaper').value === 'yes';
+
+    let subtotal = basePrice + extraFees + folding;
+    let matteSurcharge = 0;
+    let total = subtotal;
+    if (matteOn) {
+        matteSurcharge = subtotal * 0.1;
+        total = subtotal + matteSurcharge;
+    }
+
+    // Build summary
+    let selH = '', finH = '';
+    let hasSel = false, hasFin = false;
+
+    if (basePrice > 0) {
+        selH = '<div class="sum-section-title">Selected Tier</div>';
+        selH += '<div class="sum-line"><span>' + size + ' ' + weight + '<br><span style="color:#94a3b8; font-size:10px;">' + selectedQtyLabel + ' · ' + selectedSide + '</span></span><b>$' + basePrice.toLocaleString() + '.00</b></div>';
+        hasSel = true;
+    }
+
+    if (folding > 0) {
+        finH += '<div class="sum-line"><span>Folding</span><b>$' + folding.toFixed(2) + '</b></div>';
+        hasFin = true;
+    }
+    if (crease > 0) {
+        finH += '<div class="sum-line"><span>Creasing</span><b>$' + crease.toFixed(2) + '</b></div>';
+        hasFin = true;
+    }
+    if (perf > 0) {
+        finH += '<div class="sum-line"><span>Perforation</span><b>$' + perf.toFixed(2) + '</b></div>';
+        hasFin = true;
+    }
+    if (lam > 0) {
+        finH += '<div class="sum-line"><span>Matte Lam</span><b>$' + lam.toFixed(2) + '</b></div>';
+        hasFin = true;
+    }
+    if (matteOn && matteSurcharge > 0) {
+        finH += '<div class="sum-line"><span>Matte Paper (+10%)</span><b>$' + matteSurcharge.toFixed(2) + '</b></div>';
+        hasFin = true;
+    }
+    if (hasFin) finH = '<div class="sum-section-title">Finishing</div>' + finH;
+
+    document.getElementById('selectionBreak').innerHTML = hasSel ? selH : '';
+    document.getElementById('finishingBreak').innerHTML = hasFin ? finH : '';
+    document.getElementById('emptyMsg').style.display = (hasSel || hasFin) ? 'none' : 'block';
+    document.getElementById('grandTotal').innerText = '$' + total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function resetAll() {
+    document.getElementById('size').value = 'A5';
+    document.getElementById('weight').value = '128GSM';
+    document.getElementById('requireFolding').value = 'no';
+    document.getElementById('mattePaper').value = 'no';
+    document.getElementById('crease').value = '';
+    document.getElementById('perf').value = '';
+    document.getElementById('lam').value = '';
+    basePrice = 0;
+    selectedQtyVal = 0;
+    renderTable();
+}
+
+renderTable();
+</script>
+
+</body>
+</html>
