@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Printing + Distribution Packages v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --primary-light: #dbeafe;
+            --accent: #10b981;
+            --warn: #f59e0b;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-soft: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin: 0;
+            letter-spacing: -0.2px;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .major-section { margin-bottom: 32px; }
+
+        /* Spec Box → Hybrid 2 card-head style */
+        .spec-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(15,23,42,.04);
+            border-left: 4px solid var(--primary);
+        }
+        .spec-box h3 {
+            margin: 0 0 8px 0;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+        .spec-box h4 {
+            margin: 4px 0 10px 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .spec-box ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 13px;
+            color: var(--text);
+        }
+        .spec-box li { margin-bottom: 4px; }
+
+        /* Size section as card */
+        .size-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(15,23,42,.04);
+        }
+
+        .size-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 14px;
+        }
+        .size-title::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Tabs — Hybrid 2 primary-blue active style */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 8px 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 8px;
+            font-family: inherit;
+            transition: all .15s;
+        }
+        .tab-btn:hover { background: white; color: var(--text); }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 1px 3px rgba(30,64,175,.3);
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: white;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: white;
+        }
+        th, td {
+            padding: 11px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            white-space: nowrap;
+            text-align: center;
+        }
+        th:first-child, td:first-child { text-align: left; }
+
+        thead th {
+            background: var(--primary-dark);
+            color: white;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        tbody tr:nth-child(even) { background: var(--bg-soft); }
+        tbody tr:hover { background: var(--primary-light); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        tbody td:first-child {
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+        tbody tr:nth-child(even) td:first-child {
+            background: #bfdbfe;
+        }
+
+        /* Category selector — prominent amber bar */
+        .category-selector {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid var(--warn);
+            border-radius: 12px;
+            position: relative;
+        }
+        .category-selector::before {
+            content: "⚡ Package Category";
+            position: absolute;
+            top: -11px;
+            left: 16px;
+            background: var(--warn);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .category-selector label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #78350f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .category-selector select {
+            flex: 1;
+            padding: 10px 38px 10px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            font-family: inherit;
+            background: white;
+            border: 1px solid var(--warn);
+            border-radius: 8px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%2378350f'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            outline: none;
+            transition: all .15s;
+        }
+        .category-selector select:focus {
+            box-shadow: 0 0 0 3px rgba(245,158,11,.2);
+        }
+
+        .category-section { display: none; }
+        .category-section.active { display: block; }
+
+        /* Ref note pill */
+        .ref-note {
+            display: inline-block;
+            padding: 3px 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 760px) {
+            body { padding: 12px; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .size-section, .spec-box { padding: 16px; }
+            .tabs { overflow-x: auto; flex-wrap: nowrap; }
+            .tab-btn { white-space: nowrap; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>Printing + Distribution Packages <span class="ref-note">Reference</span></h1>
+                <div class="page-subtitle">Pick a category to view pricing tiers by size &amp; GSM</div>
+            </div>
+        </div>
+
+        <div class="category-selector">
+            <label for="categorySelect">Category:</label>
+            <select id="categorySelect" onchange="switchCategory(this.value)">
+                <option value="hdb">HDB (Door to Door / Car Drop)</option>
+                <option value="landed">Landed</option>
+                <option value="walkway">Walkway</option>
+                <option value="industrial">Industrial</option>
+            </select>
+        </div>
+
+        <!-- CATEGORY: HDB Door to Door & Car Drop -->
+        <div id="cat-hdb" class="category-section active">
+            <div class="major-section">
+                <div class="spec-box">
+                    <h3>Printing &amp; Distribution (HDB Door To Door) &amp; (Car Drop)</h3>
+                    <h4>Quotation as per below, for your consideration:</h4>
+                    <ul>
+                        <li>Printing of Flyer</li>
+                        <li>Full colour</li>
+                    </ul>
+                </div>
+
+                <!-- A5 -->
+                <div class="size-section">
+                    <div class="size-title">A5 Size</div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="openTab(event, 'pd-a5-80')">80gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'pd-a5-128')">128gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'pd-a5-157')">157gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'pd-a5-260')">260gsm</button>
+                    </div>
+
+                    <!-- A5 80gsm (with Express columns) -->
+                    <div id="pd-a5-80" class="tab-content active">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Express (SS)</th>
+                                        <th>Double-Side Price</th>
+                                        <th>Express (DS)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 540</td>
+                                        <td>$ 1031</td>
+                                        <td>$ 590</td>
+                                        <td>$ 1044</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1070</td>
+                                        <td>-</td>
+                                        <td>$ 1100</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 1459</td>
+                                        <td>-</td>
+                                        <td>$ 1507</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 1900</td>
+                                        <td>-</td>
+                                        <td>$ 1961</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 2362</td>
+                                        <td>-</td>
+                                        <td>$ 2451</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 2825</td>
+                                        <td>-</td>
+                                        <td>$ 2918</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 3295</td>
+                                        <td>-</td>
+                                        <td>$ 3300</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 3679</td>
+                                        <td>-</td>
+                                        <td>$ 3745</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 4135</td>
+                                        <td>-</td>
+                                        <td>$ 4203</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 4570</td>
+                                        <td>-</td>
+                                        <td>$ 4670</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 9135</td>
+                                        <td>-</td>
+                                        <td>$ 9332</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- A5 128gsm (with Express columns, only where provided) -->
+                    <div id="pd-a5-128" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Express (SS)</th>
+                                        <th>Double-Side Price</th>
+                                        <th>Express (DS)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 550</td>
+                                        <td>$ 1051</td>
+                                        <td>$ 610</td>
+                                        <td>$ 1064</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1090</td>
+                                        <td>$ 1798</td>
+                                        <td>$ 1120</td>
+                                        <td>$ 1824</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 1543</td>
+                                        <td>-</td>
+                                        <td>$ 1592</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 2015</td>
+                                        <td>-</td>
+                                        <td>$ 2070</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 2492</td>
+                                        <td>-</td>
+                                        <td>$ 2577</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 2972</td>
+                                        <td>-</td>
+                                        <td>$ 3038</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 3400</td>
+                                        <td>-</td>
+                                        <td>$ 3487</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 3880</td>
+                                        <td>-</td>
+                                        <td>$ 3966</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 4360</td>
+                                        <td>-</td>
+                                        <td>$ 4459</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 4843</td>
+                                        <td>-</td>
+                                        <td>$ 4943</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 9681</td>
+                                        <td>-</td>
+                                        <td>$ 9878</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- A5 157gsm -->
+                    <div id="pd-a5-157" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 627</td>
+                                        <td>$ 649</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1120</td>
+                                        <td>$ 1167</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 1663</td>
+                                        <td>$ 1742</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 2181</td>
+                                        <td>$ 2239</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 2693</td>
+                                        <td>$ 2783</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 3160</td>
+                                        <td>$ 3244</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 3680</td>
+                                        <td>$ 3778</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 4205</td>
+                                        <td>$ 4315</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 4728</td>
+                                        <td>$ 4826</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 5230</td>
+                                        <td>$ 5330</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 10455</td>
+                                        <td>$ 10652</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- A5 260gsm -->
+                    <div id="pd-a5-260" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 809</td>
+                                        <td>$ 823</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1498</td>
+                                        <td>$ 1599</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 2240</td>
+                                        <td>$ 2317</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 2866</td>
+                                        <td>$ 2969</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Envelope -->
+                <div class="size-section">
+                    <div class="size-title">As Envelope (For Property Agent)</div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="openTab(event, 'pd-env-128')">128gsm</button>
+                    </div>
+
+                    <div id="pd-env-128" class="tab-content active">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1K</td>
+                                        <td>$ 518</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2K</td>
+                                        <td>$ 655</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 1922</td>
+                                        <td>$ 2972</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 3557</td>
+                                        <td>$ 1700</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- A4 -->
+                <div class="size-section">
+                    <div class="size-title">A4 Size</div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="openTab(event, 'pd-a4-80')">80gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'pd-a4-128')">128gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'pd-a4-157')">157gsm</button>
+                    </div>
+
+                    <div id="pd-a4-80" class="tab-content active">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 730</td>
+                                        <td>$ 750</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1275</td>
+                                        <td>$ 1352</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 1840</td>
+                                        <td>$ 1928</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 2449</td>
+                                        <td>$ 2535</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 3059</td>
+                                        <td>$ 3099</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 3669</td>
+                                        <td>$ 3691</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 4248</td>
+                                        <td>$ 4305</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 4826</td>
+                                        <td>$ 4919</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 5405</td>
+                                        <td>$ 5529</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 5984</td>
+                                        <td>$ 6129</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 11804</td>
+                                        <td>$ 12251</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="pd-a4-128" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 750</td>
+                                        <td>$ 770</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1367</td>
+                                        <td>$ 1445</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 2019</td>
+                                        <td>$ 2085</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 2679</td>
+                                        <td>$ 2757</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 3339</td>
+                                        <td>$ 3439</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 3997</td>
+                                        <td>$ 4118</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 4630</td>
+                                        <td>$ 4771</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 5263</td>
+                                        <td>$ 5423</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 5897</td>
+                                        <td>$ 6076</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 6530</td>
+                                        <td>$ 6729</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 12922</td>
+                                        <td>$ 13370</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="pd-a4-157" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 858</td>
+                                        <td>$ 896</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end cat-hdb -->
+
+        <!-- CATEGORY: Landed / Walkway / Industrial (shared pricing) -->
+        <div id="cat-dist" class="category-section">
+            <div class="major-section">
+                <div class="spec-box">
+                    <h3 id="dist-heading">Printing + Landed Distribution Package</h3>
+                    <h4>Quotation as per below, for your consideration:</h4>
+                    <ul>
+                        <li>Printing of Flyer</li>
+                        <li>Full colour</li>
+                        <li>Industrial / Walkway / Landed distribution package</li>
+                    </ul>
+                </div>
+
+                <!-- A5 (Industrial/Walkway/Landed) -->
+                <div class="size-section">
+                    <div class="size-title">A5 Size</div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="openTab(event, 'il-a5-80')">80gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'il-a5-128')">128gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'il-a5-157')">157gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'il-a5-260')">260gsm</button>
+                    </div>
+
+                    <div id="il-a5-80" class="tab-content active">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1K</td>
+                                        <td>$ 308</td>
+                                        <td>$ 342</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2K</td>
+                                        <td>$ 342</td>
+                                        <td>$ 376</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4K</td>
+                                        <td>$ 421</td>
+                                        <td>$ 455</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6K</td>
+                                        <td>$ 591</td>
+                                        <td>$ 675</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 855</td>
+                                        <td>$ 910</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1701</td>
+                                        <td>$ 1733</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 2509</td>
+                                        <td>$ 2557</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 3300</td>
+                                        <td>$ 3361</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 4112</td>
+                                        <td>$ 4191</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 4925</td>
+                                        <td>$ 5018</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 5735</td>
+                                        <td>$ 5750</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 6525</td>
+                                        <td>$ 6570</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 7289</td>
+                                        <td>$ 7385</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 8070</td>
+                                        <td>$ 8170</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 16135</td>
+                                        <td>$ 16332</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="il-a5-128" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1K</td>
+                                        <td>$ 332</td>
+                                        <td>$ 362</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2K</td>
+                                        <td>$ 366</td>
+                                        <td>$ 416</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4K</td>
+                                        <td>$ 445</td>
+                                        <td>$ 505</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6K</td>
+                                        <td>$ 625</td>
+                                        <td>$ 685</td>
+                                    </tr>
+                                    <tr>
+                                        <td>8K</td>
+                                        <td>$ 800</td>
+                                        <td>$ 846</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 870</td>
+                                        <td>$ 930</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1738</td>
+                                        <td>$ 1780</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 2593</td>
+                                        <td>$ 2642</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 3415</td>
+                                        <td>$ 3499</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 4242</td>
+                                        <td>$ 4327</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 5072</td>
+                                        <td>$ 5138</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 5909</td>
+                                        <td>$ 5969</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 6723</td>
+                                        <td>$ 6759</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 7549</td>
+                                        <td>$ 7603</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 8343</td>
+                                        <td>$ 8443</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 16681</td>
+                                        <td>$ 16878</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="il-a5-157" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 987</td>
+                                        <td>$ 1009</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1840</td>
+                                        <td>$ 1900</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 2743</td>
+                                        <td>$ 2822</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 3619</td>
+                                        <td>$ 3750</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 4493</td>
+                                        <td>$ 4583</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 5320</td>
+                                        <td>$ 5404</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 6205</td>
+                                        <td>$ 6300</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 7090</td>
+                                        <td>$ 7190</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 7968</td>
+                                        <td>$ 8066</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 8830</td>
+                                        <td>$ 8930</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 17655</td>
+                                        <td>$ 17852</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="il-a5-260" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 1149</td>
+                                        <td>$ 1163</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 2178</td>
+                                        <td>$ 2209</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 3268</td>
+                                        <td>$ 3345</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 4226</td>
+                                        <td>$ 4329</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- A4 (Industrial/Walkway/Landed) -->
+                <div class="size-section">
+                    <div class="size-title">A4 Size</div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="openTab(event, 'il-a4-80')">80gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'il-a4-128')">128gsm</button>
+                        <button class="tab-btn" onclick="openTab(event, 'il-a4-157')">157gsm</button>
+                    </div>
+
+                    <div id="il-a4-80" class="tab-content active">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1K</td>
+                                        <td>$ 343</td>
+                                        <td>$ 357</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2K</td>
+                                        <td>$ 355</td>
+                                        <td>$ 396</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4K</td>
+                                        <td>$ 478</td>
+                                        <td>$ 565</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6K</td>
+                                        <td>$ 685</td>
+                                        <td>$ 753</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 1033</td>
+                                        <td>$ 1068</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 1955</td>
+                                        <td>$ 2032</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 2860</td>
+                                        <td>$ 2948</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 3809</td>
+                                        <td>$ 3895</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 4759</td>
+                                        <td>$ 4829</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 5709</td>
+                                        <td>$ 5731</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 6628</td>
+                                        <td>$ 6679</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 7546</td>
+                                        <td>$ 7633</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 8465</td>
+                                        <td>$ 8579</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 9384</td>
+                                        <td>$ 9529</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 18604</td>
+                                        <td>$ 19051</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="il-a4-128" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1K</td>
+                                        <td>$ 347</td>
+                                        <td>$ 397</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2K</td>
+                                        <td>$ 386</td>
+                                        <td>$ 446</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4K</td>
+                                        <td>$ 541</td>
+                                        <td>$ 585</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6K</td>
+                                        <td>$ 785</td>
+                                        <td>$ 821</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 1087</td>
+                                        <td>$ 1136</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20K</td>
+                                        <td>$ 2047</td>
+                                        <td>$ 2125</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30K</td>
+                                        <td>$ 3070</td>
+                                        <td>$ 3105</td>
+                                    </tr>
+                                    <tr>
+                                        <td>40K</td>
+                                        <td>$ 4059</td>
+                                        <td>$ 4109</td>
+                                    </tr>
+                                    <tr>
+                                        <td>50K</td>
+                                        <td>$ 5035</td>
+                                        <td>$ 5135</td>
+                                    </tr>
+                                    <tr>
+                                        <td>60K</td>
+                                        <td>$ 6037</td>
+                                        <td>$ 6158</td>
+                                    </tr>
+                                    <tr>
+                                        <td>70K</td>
+                                        <td>$ 7010</td>
+                                        <td>$ 7151</td>
+                                    </tr>
+                                    <tr>
+                                        <td>80K</td>
+                                        <td>$ 7983</td>
+                                        <td>$ 8143</td>
+                                    </tr>
+                                    <tr>
+                                        <td>90K</td>
+                                        <td>$ 8957</td>
+                                        <td>$ 9136</td>
+                                    </tr>
+                                    <tr>
+                                        <td>100K</td>
+                                        <td>$ 9930</td>
+                                        <td>$ 10129</td>
+                                    </tr>
+                                    <tr>
+                                        <td>200K</td>
+                                        <td>$ 19722</td>
+                                        <td>$ 20170</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="il-a4-157" class="tab-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Single-Side Price</th>
+                                        <th>Double-Side Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>4K</td>
+                                        <td>$ 527</td>
+                                        <td>$ 571</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10K</td>
+                                        <td>$ 1027</td>
+                                        <td>$ 1076</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end cat-dist -->
+
+    </div>
+
+    <script>
+        function openTab(evt, tabId) {
+            var section = evt.currentTarget.closest(".size-section");
+            var contents = section.getElementsByClassName("tab-content");
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
+            }
+            var btns = section.getElementsByClassName("tab-btn");
+            for (var j = 0; j < btns.length; j++) {
+                btns[j].classList.remove("active");
+            }
+            section.querySelector("#" + tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function switchCategory(category) {
+            var sections = document.querySelectorAll('.category-section');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].classList.remove('active');
+            }
+            if (category === 'hdb') {
+                document.getElementById('cat-hdb').classList.add('active');
+            } else {
+                document.getElementById('cat-dist').classList.add('active');
+                var heading = document.getElementById('dist-heading');
+                var names = {
+                    'landed': 'Printing + Landed Distribution Package',
+                    'walkway': 'Printing + Walkway Distribution Package',
+                    'industrial': 'Printing + Industrial Distribution Package'
+                };
+                heading.textContent = names[category];
+            }
+        }
+    </script>
+
+</body>
+
+</html>
