@@ -189,22 +189,6 @@ select {
 .tab-panel { display: none; padding: 20px; }
 .tab-panel.active { display: block; }
 
-/* Sub-pills (used by condo tabs) */
-.sub-pill {
-    padding: 8px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-    background: var(--bg-soft);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all .15s;
-}
-.sub-pill:hover { background: white; color: var(--text); }
-.sub-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
-
 .dist-size-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -643,8 +627,6 @@ select {
                 <button class="tab" data-tab="landed" onclick="switchTab('landed')">Landed</button>
                 <button class="tab" data-tab="ind" onclick="switchTab('ind')">Industrial</button>
                 <button class="tab" data-tab="walk" onclick="switchTab('walk')">Walkway &amp; Manpower</button>
-                <button class="tab" data-tab="condohdr" onclick="switchTab('condohdr')">Condo HDR</button>
-                <button class="tab" data-tab="condoadmail" onclick="switchTab('condoadmail')">Condo Admail</button>
             </div>
             <div class="dist-size-row">
                 <div>
@@ -718,65 +700,6 @@ select {
                 <div class="service-row"><div><div class="service-label">Walkway Sandwich Board</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Walkway Backpack</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Printing Formboard Add-on</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
-            </div>
-
-            <!-- Condo HDR panel -->
-            <div class="tab-panel" id="panel-condohdr">
-                <div class="fld-label" style="margin-bottom:8px;">Variant</div>
-                <div class="sub-pills" id="condoHdrVariantPills" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
-                    <button type="button" class="sub-pill active" data-variant="std" onclick="switchCondoHdrVariant('std')">Standard</button>
-                    <button type="button" class="sub-pill" data-variant="enh" onclick="switchCondoHdrVariant('enh')">Enhanced</button>
-                </div>
-                <div class="fld-label" style="margin-bottom:8px;">Paper Size &amp; Type</div>
-                <div class="sub-pills" id="condoHdrTypePills" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
-                    <button type="button" class="sub-pill active" data-type="a5" onclick="switchCondoHdrType('a5')">A5 128-260gsm (25g)</button>
-                    <button type="button" class="sub-pill" data-type="a4" onclick="switchCondoHdrType('a4')">A4 128-310gsm (50g)</button>
-                    <button type="button" class="sub-pill" data-type="a3fold" onclick="switchCondoHdrType('a3fold')">A3 fold letterbox (50g)</button>
-                    <button type="button" class="sub-pill" data-type="a3310" onclick="switchCondoHdrType('a3310')">A3 310gsm (50g)</button>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 2fr; gap:14px; align-items:end; margin-bottom:14px;">
-                    <div>
-                        <label class="fld-label">Quantity</label>
-                        <input type="number" id="condoHdrQty" placeholder="e.g. 2000" oninput="update()">
-                    </div>
-                    <div style="padding:14px 18px; background:var(--primary-light); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:13px; font-weight:700; color:var(--primary);">Condo HDR Quote</span>
-                        <span id="condoHdrResult" style="font-size:22px; font-weight:800; color:var(--primary);">$0.00</span>
-                    </div>
-                </div>
-                <div style="padding:10px 14px; background:#f0f7fd; border-radius:8px; font-size:11px; color:#475569;">
-                    <b>Price with envelope &amp; insertion</b> · 10-14 working days peak period leadtime<br>
-                    <span style="color:#64748b;" id="condoHdrHint"></span>
-                </div>
-            </div>
-
-            <!-- Condo Admail panel -->
-            <div class="tab-panel" id="panel-condoadmail">
-                <div class="fld-label" style="margin-bottom:8px;">Season</div>
-                <div class="sub-pills" id="condoAdmailSeasonPills" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
-                    <button type="button" class="sub-pill active" data-season="feb-sept" onclick="switchCondoAdmailSeason('feb-sept')">Feb - Sept</button>
-                    <button type="button" class="sub-pill" data-season="oct-jan" onclick="switchCondoAdmailSeason('oct-jan')">Oct - Jan</button>
-                </div>
-                <div class="fld-label" style="margin-bottom:8px;">Size</div>
-                <div class="sub-pills" id="condoAdmailSizePills" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
-                    <button type="button" class="sub-pill active" data-size="A5" onclick="switchCondoAdmailSize('A5')">A5</button>
-                    <button type="button" class="sub-pill" data-size="A4" onclick="switchCondoAdmailSize('A4')">A4</button>
-                    <button type="button" class="sub-pill" data-size="A3" onclick="switchCondoAdmailSize('A3')">A3</button>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 2fr; gap:14px; align-items:end; margin-bottom:14px;">
-                    <div>
-                        <label class="fld-label">Quantity</label>
-                        <input type="number" id="condoAdmailQty" placeholder="e.g. 18750" oninput="update()">
-                    </div>
-                    <div style="padding:14px 18px; background:var(--primary-light); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:13px; font-weight:700; color:var(--primary);">Condo Admail Quote</span>
-                        <span id="condoAdmailResult" style="font-size:22px; font-weight:800; color:var(--primary);">$0.00</span>
-                    </div>
-                </div>
-                <div style="padding:10px 14px; background:#f0f7fd; border-radius:8px; font-size:11px; color:#475569;">
-                    <b>Condo Admail</b> · Minimum quote $3,531<br>
-                    <span style="color:#64748b;" id="condoAdmailHint"></span>
-                </div>
             </div>
         </div>
 
@@ -1005,70 +928,6 @@ function toggleAddons(){
 function switchTab(name){
     document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===name);});
     document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+name);});
-    update();
-}
-
-// ========= CONDO DATA =========
-var CONDO_HDR = {
-    'std': {
-        'a5':     {rate: 0.545,  moq: 1220.21, has180: true,  label: 'A5 128-260gsm', sub: 'HDR 2000 units, 25g'},
-        'a4':     {rate: 0.9265, moq: 2158.26, has180: true,  label: 'A4 128-310gsm', sub: 'HDR 1539 units, 50g'},
-        'a3fold': {rate: 0.9265, moq: 2519.28, has180: true,  label: 'A3 fold letterbox', sub: 'HDR 1539 units, 50g, must-have-fold'},
-        'a3310':  {rate: 1.0355, moq: 2158.26, has180: false, label: 'A3 310gsm', sub: 'HDR 1539 units, 50g'}
-    },
-    'enh': {
-        'a5':     {rate: 0.5995, moq: 1220.21, has180: true,  label: 'A5 128-260gsm', sub: 'HDR 2000 units, 25g'},
-        'a4':     {rate: 0.981,  moq: 2158.26, has180: true,  label: 'A4 128-310gsm', sub: 'HDR 1539 units, 50g'},
-        'a3fold': {rate: 0.981,  moq: 2519.28, has180: true,  label: 'A3 fold letterbox', sub: 'HDR 1539 units, 50g, must-have-fold'},
-        'a3310':  {rate: 1.09,   moq: 2158.26, has180: false, label: 'A3 310gsm', sub: 'HDR 1539 units, 50g'}
-    }
-};
-var CONDO_ADMAIL = {
-    'feb-sept': {rate: 0.1744, label: 'Feb - Sept'},
-    'oct-jan':  {rate: 0.218,  label: 'Oct - Jan'}
-};
-var CONDO_ADMAIL_MOQ = 3531;
-var currentCondoHdrVariant = 'std';
-var currentCondoHdrType = 'a5';
-var currentCondoAdmailSeason = 'feb-sept';
-var currentCondoAdmailSize = 'A5';
-
-function switchCondoHdrVariant(v){
-    currentCondoHdrVariant = v;
-    document.querySelectorAll('#condoHdrVariantPills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.variant===v);});
-    update();
-}
-function switchCondoHdrType(t){
-    currentCondoHdrType = t;
-    document.querySelectorAll('#condoHdrTypePills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.type===t);});
-    update();
-}
-function switchCondoAdmailSeason(s){
-    currentCondoAdmailSeason = s;
-    document.querySelectorAll('#condoAdmailSeasonPills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.season===s);});
-    update();
-}
-function switchCondoAdmailSize(s){
-    currentCondoAdmailSize = s;
-    document.querySelectorAll('#condoAdmailSizePills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.size===s);});
-    update();
-}
-function calcCondoHdr(variant, type, qty){
-    if(qty <= 0) return {cost:0, quote:0, final:0};
-    var d = CONDO_HDR[variant] && CONDO_HDR[variant][type];
-    if(!d) return {cost:0, quote:0, final:0};
-    var cost = qty * d.rate;
-    var quote = d.has180 ? Math.max(cost + 180, cost * 1.10) : cost * 1.10;
-    var final = Math.max(quote, d.moq);
-    return {cost:cost, quote:quote, final:Math.round(final*100)/100, label:d.label, sub:d.sub};
-}
-function calcCondoAdmail(season, qty){
-    if(qty <= 0) return {cost:0, quote:0, final:0};
-    var rate = CONDO_ADMAIL[season].rate;
-    var cost = qty * rate;
-    var quote = cost * 1.10;
-    var final = Math.max(quote, CONDO_ADMAIL_MOQ);
-    return {cost:cost, quote:quote, final:Math.round(final*100)/100};
 }
 
 function toggleAhwei(fromCheckbox){
@@ -1234,30 +1093,6 @@ function update(){
             hasD=true;
         }
     });
-
-    // Condo HDR
-    var condoHdrQty = parseFloat(document.getElementById('condoHdrQty').value)||0;
-    var condoHdrR = calcCondoHdr(currentCondoHdrVariant, currentCondoHdrType, condoHdrQty);
-    document.getElementById('condoHdrResult').textContent = '$' + condoHdrR.final.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-    document.getElementById('condoHdrHint').textContent = condoHdrQty>0 ? ('Cost: $'+condoHdrR.cost.toFixed(2)+' · Quote (markup): $'+condoHdrR.quote.toFixed(2)+' · Final (MOQ floor): $'+condoHdrR.final.toFixed(2)) : '';
-    if(condoHdrR.final > 0){
-        var variantLabel = (currentCondoHdrVariant==='std') ? 'Standard' : 'Enhanced';
-        dTotal += condoHdrR.final;
-        dH += '<div class="sum-line"><span>Condo HDR — '+variantLabel+' '+condoHdrR.label+' x'+condoHdrQty.toLocaleString()+'</span><b>$'+condoHdrR.final.toFixed(2)+'</b></div>';
-        hasD = true;
-    }
-
-    // Condo Admail
-    var condoAdQty = parseFloat(document.getElementById('condoAdmailQty').value)||0;
-    var condoAdR = calcCondoAdmail(currentCondoAdmailSeason, condoAdQty);
-    document.getElementById('condoAdmailResult').textContent = '$' + condoAdR.final.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-    document.getElementById('condoAdmailHint').textContent = condoAdQty>0 ? ('Cost: $'+condoAdR.cost.toFixed(2)+' · Quote (10% markup): $'+condoAdR.quote.toFixed(2)+' · Final (MOQ $3,531): $'+condoAdR.final.toFixed(2)) : '';
-    if(condoAdR.final > 0){
-        var seasonLabel = CONDO_ADMAIL[currentCondoAdmailSeason].label;
-        dTotal += condoAdR.final;
-        dH += '<div class="sum-line"><span>Condo Admail — '+seasonLabel+' '+currentCondoAdmailSize+' x'+condoAdQty.toLocaleString()+'</span><b>$'+condoAdR.final.toFixed(2)+'</b></div>';
-        hasD = true;
-    }
 
     // Delivery
     var delChecked=document.getElementById('delToggle').checked;

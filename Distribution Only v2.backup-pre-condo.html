@@ -492,75 +492,11 @@ select {
                     </button>
                     <div class="ref-tables" id="refTables"></div>
                 </div>
-                </div><!-- /regularServiceContent -->
-
-                <!-- Condo HDR content -->
-                <div id="condoHdrContent" style="display:none;">
-                    <div class="fld-label" style="margin-bottom:8px;">Variant</div>
-                    <div class="sub-pills" id="condoHdrVariantPills">
-                        <button class="sub-pill active" data-variant="std" onclick="switchCondoHdrVariant('std')">Standard</button>
-                        <button class="sub-pill" data-variant="enh" onclick="switchCondoHdrVariant('enh')">Enhanced</button>
-                    </div>
-
-                    <div class="fld-label" style="margin-bottom:8px; margin-top:14px;">Paper Size & Type</div>
-                    <div class="sub-pills" id="condoHdrTypePills">
-                        <button class="sub-pill active" data-type="a5" onclick="switchCondoHdrType('a5')">A5 128-260gsm (25g)</button>
-                        <button class="sub-pill" data-type="a4" onclick="switchCondoHdrType('a4')">A4 128-310gsm (50g)</button>
-                        <button class="sub-pill" data-type="a3fold" onclick="switchCondoHdrType('a3fold')">A3 fold letterbox (50g)</button>
-                        <button class="sub-pill" data-type="a3310" onclick="switchCondoHdrType('a3310')">A3 310gsm (50g)</button>
-                    </div>
-
-                    <div class="calc-inputs" style="margin-top:16px;">
-                        <div>
-                            <label class="fld-label">Quantity</label>
-                            <input type="number" id="condoHdrQty" placeholder="e.g. 2000" oninput="update()">
-                        </div>
-                        <div class="result-box">
-                            <span class="result-box-label">Condo HDR Quote</span>
-                            <span id="condoHdrResult" class="result-box-value">$0.00</span>
-                        </div>
-                    </div>
-                    <div style="padding:12px 16px; background:#f0f7fd; border-radius:8px; margin-top:14px; font-size:12px; color:#334155;">
-                        <b>Price with envelope & insertion</b> · 10-14 working days peak period leadtime<br>
-                        <span style="color:#64748b; font-size:11px;" id="condoHdrHint"></span>
-                    </div>
-                </div>
-
-                <!-- Condo Admail content -->
-                <div id="condoAdmailContent" style="display:none;">
-                    <div class="fld-label" style="margin-bottom:8px;">Season</div>
-                    <div class="sub-pills" id="condoAdmailSeasonPills">
-                        <button class="sub-pill active" data-season="feb-sept" onclick="switchCondoAdmailSeason('feb-sept')">Feb - Sept</button>
-                        <button class="sub-pill" data-season="oct-jan" onclick="switchCondoAdmailSeason('oct-jan')">Oct - Jan</button>
-                    </div>
-
-                    <div class="fld-label" style="margin-bottom:8px; margin-top:14px;">Size</div>
-                    <div class="sub-pills" id="condoAdmailSizePills">
-                        <button class="sub-pill active" data-size="A5" onclick="switchCondoAdmailSize('A5')">A5</button>
-                        <button class="sub-pill" data-size="A4" onclick="switchCondoAdmailSize('A4')">A4</button>
-                        <button class="sub-pill" data-size="A3" onclick="switchCondoAdmailSize('A3')">A3</button>
-                    </div>
-
-                    <div class="calc-inputs" style="margin-top:16px;">
-                        <div>
-                            <label class="fld-label">Quantity</label>
-                            <input type="number" id="condoAdmailQty" placeholder="e.g. 18750" oninput="update()">
-                        </div>
-                        <div class="result-box">
-                            <span class="result-box-label">Condo Admail Quote</span>
-                            <span id="condoAdmailResult" class="result-box-value">$0.00</span>
-                        </div>
-                    </div>
-                    <div style="padding:12px 16px; background:#f0f7fd; border-radius:8px; margin-top:14px; font-size:12px; color:#334155;">
-                        <b>Condo Admail</b> · Minimum quote $3,531<br>
-                        <span style="color:#64748b; font-size:11px;" id="condoAdmailHint"></span>
-                    </div>
-                </div>
             </div>
         </div>
 
         <!-- 2. Quantity & Cost -->
-        <div class="card" id="section-qty">
+        <div class="card">
             <div class="card-head">
                 <div class="card-title"><span class="card-num">2</span>Enter Quantity</div>
                 <div class="card-hint" id="qtyHint">Proration between tiers</div>
@@ -580,7 +516,7 @@ select {
         </div>
 
         <!-- 3. Add-on Surcharges -->
-        <div class="card" id="section-addon">
+        <div class="card">
             <div class="card-head">
                 <div class="card-title"><span class="card-num">3</span>Add-on Surcharges</div>
                 <div class="card-hint">Optional extras</div>
@@ -772,100 +708,23 @@ function getServiceLabel(){
 function switchService(name){
     currentService = name;
     document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===name);});
-    var isCondo = (name === 'condohdr' || name === 'condoadmail');
-
-    // Show/hide content blocks based on service
-    document.getElementById('regularServiceContent').style.display = isCondo ? 'none' : 'block';
-    document.getElementById('condoHdrContent').style.display = (name === 'condohdr') ? 'block' : 'none';
-    document.getElementById('condoAdmailContent').style.display = (name === 'condoadmail') ? 'block' : 'none';
-
-    // Sections 2 and 3 are hidden for condo services
-    document.getElementById('section-qty').style.display = isCondo ? 'none' : 'block';
-    document.getElementById('section-addon').style.display = isCondo ? 'none' : 'block';
-
-    if (!isCondo) {
-        document.getElementById('hdbSubWrap').style.display = (name==='hdb')?'block':'none';
-        document.getElementById('walkSubWrap').style.display = (name==='walkway')?'block':'none';
-        var qL = document.getElementById('qtyLabel');
-        var qI = document.getElementById('calcQty');
-        var qH = document.getElementById('qtyHint');
-        if(name==='walkway'){
-            qL.textContent='Slots';
-            qI.placeholder='e.g. 3';
-            qH.textContent='1-4 slot tier pricing, above 4 per-slot rate';
-        } else {
-            qL.textContent='Quantity';
-            qI.placeholder='e.g. 5000';
-            qH.textContent='Proration between tiers';
-        }
-        renderRefTable();
+    document.getElementById('hdbSubWrap').style.display = (name==='hdb')?'block':'none';
+    document.getElementById('walkSubWrap').style.display = (name==='walkway')?'block':'none';
+    // Update qty label/placeholder for walkway (slots)
+    var qL = document.getElementById('qtyLabel');
+    var qI = document.getElementById('calcQty');
+    var qH = document.getElementById('qtyHint');
+    if(name==='walkway'){
+        qL.textContent='Slots';
+        qI.placeholder='e.g. 3';
+        qH.textContent='1-4 slot tier pricing, above 4 per-slot rate';
+    } else {
+        qL.textContent='Quantity';
+        qI.placeholder='e.g. 5000';
+        qH.textContent='Proration between tiers';
     }
+    renderRefTable();
     update();
-}
-
-// ========= CONDO DATA =========
-var CONDO_HDR = {
-    'std': {
-        'a5':     {rate: 0.545,  moq: 1220.21, has180: true,  label: 'A5 128-260gsm', sub: 'HDR 2000 units, 25g'},
-        'a4':     {rate: 0.9265, moq: 2158.26, has180: true,  label: 'A4 128-310gsm', sub: 'HDR 1539 units, 50g'},
-        'a3fold': {rate: 0.9265, moq: 2519.28, has180: true,  label: 'A3 fold letterbox', sub: 'HDR 1539 units, 50g, must-have-fold'},
-        'a3310':  {rate: 1.0355, moq: 2158.26, has180: false, label: 'A3 310gsm', sub: 'HDR 1539 units, 50g'}
-    },
-    'enh': {
-        'a5':     {rate: 0.5995, moq: 1220.21, has180: true,  label: 'A5 128-260gsm', sub: 'HDR 2000 units, 25g'},
-        'a4':     {rate: 0.981,  moq: 2158.26, has180: true,  label: 'A4 128-310gsm', sub: 'HDR 1539 units, 50g'},
-        'a3fold': {rate: 0.981,  moq: 2519.28, has180: true,  label: 'A3 fold letterbox', sub: 'HDR 1539 units, 50g, must-have-fold'},
-        'a3310':  {rate: 1.09,   moq: 2158.26, has180: false, label: 'A3 310gsm', sub: 'HDR 1539 units, 50g'}
-    }
-};
-var CONDO_ADMAIL = {
-    'feb-sept': {rate: 0.1744, label: 'Feb - Sept'},
-    'oct-jan':  {rate: 0.218,  label: 'Oct - Jan'}
-};
-var CONDO_ADMAIL_MOQ = 3531;
-
-var currentCondoHdrVariant = 'std';
-var currentCondoHdrType = 'a5';
-var currentCondoAdmailSeason = 'feb-sept';
-var currentCondoAdmailSize = 'A5';
-
-function switchCondoHdrVariant(v){
-    currentCondoHdrVariant = v;
-    document.querySelectorAll('#condoHdrVariantPills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.variant===v);});
-    update();
-}
-function switchCondoHdrType(t){
-    currentCondoHdrType = t;
-    document.querySelectorAll('#condoHdrTypePills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.type===t);});
-    update();
-}
-function switchCondoAdmailSeason(s){
-    currentCondoAdmailSeason = s;
-    document.querySelectorAll('#condoAdmailSeasonPills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.season===s);});
-    update();
-}
-function switchCondoAdmailSize(s){
-    currentCondoAdmailSize = s;
-    document.querySelectorAll('#condoAdmailSizePills .sub-pill').forEach(function(p){p.classList.toggle('active',p.dataset.size===s);});
-    update();
-}
-
-function calcCondoHdr(variant, type, qty){
-    if(qty <= 0) return {cost:0, quote:0, final:0};
-    var d = CONDO_HDR[variant] && CONDO_HDR[variant][type];
-    if(!d) return {cost:0, quote:0, final:0};
-    var cost = qty * d.rate;
-    var quote = d.has180 ? Math.max(cost + 180, cost * 1.10) : cost * 1.10;
-    var final = Math.max(quote, d.moq);
-    return {cost: cost, quote: quote, final: Math.round(final*100)/100, label: d.label, sub: d.sub};
-}
-function calcCondoAdmail(season, qty){
-    if(qty <= 0) return {cost:0, quote:0, final:0};
-    var rate = CONDO_ADMAIL[season].rate;
-    var cost = qty * rate;
-    var quote = cost * 1.10;
-    var final = Math.max(quote, CONDO_ADMAIL_MOQ);
-    return {cost: cost, quote: quote, final: Math.round(final*100)/100};
 }
 
 function switchHdbSub(sub){
@@ -927,76 +786,7 @@ function updateMultiDesigns(){
     update();
 }
 
-function renderSummaryAndDelivery(distH, addonH, hasDist, hasAddon, grandTotal){
-    var delH = '';
-    var hasDel = false;
-    var delChecked = document.getElementById('delToggle').checked;
-    document.getElementById('delCartonWrap').style.display = delChecked?'grid':'none';
-    if(delChecked){
-        var cartons = parseInt(document.getElementById('delCartons').value)||0;
-        var delFee = getDeliveryFee(cartons);
-        document.getElementById('delFeeDisplay').textContent = '$'+delFee.toFixed(2);
-        if(cartons > 0){
-            delH = '<div class="sum-section-title">Delivery</div>';
-            delH += '<div class="sum-line"><span>Delivery ('+cartons+' carton'+(cartons>1?'s':'')+')</span><b>$'+delFee.toFixed(2)+'</b></div>';
-            grandTotal += delFee;
-            hasDel = true;
-        }
-    }
-    document.getElementById('distBreak').innerHTML = hasDist ? distH : '';
-    document.getElementById('addonBreak').innerHTML = hasAddon ? addonH : '';
-    document.getElementById('delBreak').innerHTML = hasDel ? delH : '';
-    document.getElementById('emptyMsg').style.display = (hasDist||hasAddon||hasDel) ? 'none' : 'block';
-    grandTotal = Math.round(grandTotal*100)/100;
-    document.getElementById('sumGrand').textContent = '$'+grandTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-}
-
 function update(){
-    var distH = '', addonH = '', delH = '';
-    var hasDist = false, hasAddon = false, hasDel = false;
-    var grandTotal = 0;
-
-    // Branch: Condo HDR
-    if(currentService === 'condohdr'){
-        var qty = parseFloat(document.getElementById('condoHdrQty').value)||0;
-        var r = calcCondoHdr(currentCondoHdrVariant, currentCondoHdrType, qty);
-        document.getElementById('condoHdrResult').textContent = '$' + r.final.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-        var hintEl = document.getElementById('condoHdrHint');
-        if(qty > 0){
-            hintEl.textContent = 'Cost: $'+r.cost.toFixed(2)+' · Quote (with markup): $'+r.quote.toFixed(2)+' · Final (with MOQ floor): $'+r.final.toFixed(2);
-            distH = '<div class="sum-section-title">Condo HDR</div>';
-            var variantLabel = (currentCondoHdrVariant === 'std') ? 'Standard' : 'Enhanced';
-            distH += '<div class="sum-line"><span>'+variantLabel+' — '+r.label+'<br><span style="color:#94a3b8; font-size:10px;">'+r.sub+' · qty '+qty.toLocaleString()+'</span></span><b>$'+r.final.toFixed(2)+'</b></div>';
-            grandTotal += r.final;
-            hasDist = true;
-        } else {
-            hintEl.textContent = '';
-        }
-        renderSummaryAndDelivery(distH, addonH, hasDist, hasAddon, grandTotal);
-        return;
-    }
-
-    // Branch: Condo Admail
-    if(currentService === 'condoadmail'){
-        var qty = parseFloat(document.getElementById('condoAdmailQty').value)||0;
-        var r = calcCondoAdmail(currentCondoAdmailSeason, qty);
-        document.getElementById('condoAdmailResult').textContent = '$' + r.final.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-        var hintEl = document.getElementById('condoAdmailHint');
-        if(qty > 0){
-            hintEl.textContent = 'Cost: $'+r.cost.toFixed(2)+' · Quote (10% markup): $'+r.quote.toFixed(2)+' · Final (MOQ $3,531): $'+r.final.toFixed(2);
-            distH = '<div class="sum-section-title">Condo Admail</div>';
-            var seasonLabel = CONDO_ADMAIL[currentCondoAdmailSeason].label;
-            distH += '<div class="sum-line"><span>'+seasonLabel+' — '+currentCondoAdmailSize+'<br><span style="color:#94a3b8; font-size:10px;">qty '+qty.toLocaleString()+'</span></span><b>$'+r.final.toFixed(2)+'</b></div>';
-            grandTotal += r.final;
-            hasDist = true;
-        } else {
-            hintEl.textContent = '';
-        }
-        renderSummaryAndDelivery(distH, addonH, hasDist, hasAddon, grandTotal);
-        return;
-    }
-
-    // Regular services
     var size = document.getElementById('calcSize').value;
     var gsm = document.getElementById('calcGsm').value;
     var qty = parseFloat(document.getElementById('calcQty').value)||0;
@@ -1037,6 +827,11 @@ function update(){
     }
     distCost = Math.round(distCost*100)/100;
     document.getElementById('estCost').textContent = '$'+distCost.toFixed(2);
+
+    // Summary state
+    var distH = '', addonH = '', delH = '';
+    var hasDist = false, hasAddon = false, hasDel = false;
+    var grandTotal = 0;
 
     if(distCost > 0){
         distH = '<div class="sum-section-title">Distribution</div>';
@@ -1127,7 +922,29 @@ function update(){
     }
 
     if(hasAddon) addonH = '<div class="sum-section-title">Add-on Surcharges</div>' + addonH;
-    renderSummaryAndDelivery(distH, addonH, hasDist, hasAddon, grandTotal);
+
+    // Delivery
+    var delChecked = document.getElementById('delToggle').checked;
+    document.getElementById('delCartonWrap').style.display = delChecked?'grid':'none';
+    if(delChecked){
+        var cartons = parseInt(document.getElementById('delCartons').value)||0;
+        var delFee = getDeliveryFee(cartons);
+        document.getElementById('delFeeDisplay').textContent = '$'+delFee.toFixed(2);
+        if(cartons > 0){
+            delH = '<div class="sum-section-title">Delivery</div>';
+            delH += '<div class="sum-line"><span>Delivery ('+cartons+' carton'+(cartons>1?'s':'')+')</span><b>$'+delFee.toFixed(2)+'</b></div>';
+            grandTotal += delFee;
+            hasDel = true;
+        }
+    }
+
+    document.getElementById('distBreak').innerHTML = hasDist ? distH : '';
+    document.getElementById('addonBreak').innerHTML = hasAddon ? addonH : '';
+    document.getElementById('delBreak').innerHTML = hasDel ? delH : '';
+    document.getElementById('emptyMsg').style.display = (hasDist||hasAddon||hasDel) ? 'none' : 'block';
+
+    grandTotal = Math.round(grandTotal*100)/100;
+    document.getElementById('sumGrand').textContent = '$'+grandTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
 function resetAll(){
