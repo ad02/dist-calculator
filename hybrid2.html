@@ -711,7 +711,7 @@ select {
             <!-- Walkway tab -->
             <div class="tab-panel" id="panel-walk">
                 <div class="service-row"><div><div class="service-label">Walkway Standard</div><div class="service-hint">Qty = # of slots</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
-                <div class="service-row"><div><div class="service-label">Walkway (School)</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway (School)</div><div class="service-hint">Base + $10 per slot</div></div><input type="number" class="d-val" data-type="walk-school" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Walkway (Remote Place)</div></div><input type="number" class="d-val" data-type="walk-remote" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Walkway Selected Date</div></div><input type="number" class="d-val" data-type="walk-exp" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Walkway Express (Remote)</div></div><input type="number" class="d-val" data-type="walk-expr" oninput="update()"></div>
@@ -924,6 +924,7 @@ var DIST_TIER_MAP={
 };
 var WALK_MAP={
     'walk-std':{tiers:WALK_STD,rate:WALK_STD_RATE},
+    'walk-school':{tiers:WALK_STD,rate:WALK_STD_RATE},
     'walk-remote':{tiers:WALK_REMOTE,rate:WALK_REMOTE_RATE},
     'walk-exp':{tiers:WALK_EXP,rate:WALK_EXP_RATE},
     'walk-expr':{tiers:WALK_EXPR,rate:WALK_EXPR_RATE}
@@ -977,9 +978,13 @@ function getWalkCost(type,gsm,size,slots){
     var g=(gsm==='80')?'128':gsm;
     var t=map.tiers[g],r=map.rate[g];
     if(!t||!r)return 0;
-    for(var i=0;i<t.length;i++){if(slots===t[i][0])return t[i][sizeIdx];}
-    if(slots>4)return t[t.length-1][sizeIdx]+(slots-4)*(r[size]||0);
-    return 0;
+    var cost=0;
+    var matched=false;
+    for(var i=0;i<t.length;i++){if(slots===t[i][0]){cost=t[i][sizeIdx];matched=true;break;}}
+    if(!matched && slots>4) cost = t[t.length-1][sizeIdx]+(slots-4)*(r[size]||0);
+    // School surcharge: +$10 per slot
+    if(type === 'walk-school' && cost > 0) cost += slots * 10;
+    return cost;
 }
 
 function getAhweiCost(){
