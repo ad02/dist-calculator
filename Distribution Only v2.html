@@ -600,7 +600,7 @@ select {
                 <!-- Walkway-specific add-ons (only shown when Walkway is selected) -->
                 <div id="addonWalkBlock" style="display:none;">
                     <div class="service-row"><div><div class="service-label">Walkway Standard</div><div class="service-hint">Qty = # of slots</div></div><input type="number" class="walk-add" data-type="walk-std" placeholder="Slots" oninput="update()"></div>
-                    <div class="service-row"><div><div class="service-label">Walkway (School)</div><div class="service-hint">Base walkway rate + $10 per school slot</div></div><input type="number" class="walk-add" data-type="walk-school" placeholder="Slots" oninput="update()"></div>
+                    <div class="service-row"><div><div class="service-label">Walkway (School)</div></div><input type="number" class="walk-add" data-type="walk-std" placeholder="Slots" oninput="update()"></div>
                     <div class="service-row"><div><div class="service-label">Walkway (Remote Place)</div></div><input type="number" class="walk-add" data-type="walk-remote" placeholder="Slots" oninput="update()"></div>
                     <div class="service-row"><div><div class="service-label">Walkway Selected Date</div></div><input type="number" class="walk-add" data-type="walk-exp" placeholder="Slots" oninput="update()"></div>
                     <div class="service-row"><div><div class="service-label">Walkway Express (Remote)</div></div><input type="number" class="walk-add" data-type="walk-expr" placeholder="Slots" oninput="update()"></div>
@@ -1164,7 +1164,7 @@ function update(){
             var type = input.dataset.type;
             var label = input.closest('.service-row').querySelector('.service-label').textContent;
             // Use Distribution Only's walkway tier tables via getServiceTiersAndRate-equivalent
-            var tableMap = {'walk-std':{tiers:WALK_STD,rate:WALK_STD_RATE},'walk-school':{tiers:WALK_STD,rate:WALK_STD_RATE},'walk-remote':{tiers:WALK_REMOTE,rate:WALK_REMOTE_RATE},'walk-exp':{tiers:WALK_EXP,rate:WALK_EXP_RATE},'walk-expr':{tiers:WALK_EXPR,rate:WALK_EXPR_RATE}};
+            var tableMap = {'walk-std':{tiers:WALK_STD,rate:WALK_STD_RATE},'walk-remote':{tiers:WALK_REMOTE,rate:WALK_REMOTE_RATE},'walk-exp':{tiers:WALK_EXP,rate:WALK_EXP_RATE},'walk-expr':{tiers:WALK_EXPR,rate:WALK_EXPR_RATE}};
             var info = tableMap[type];
             if(!info) return;
             var t = info.tiers[gsm], r = info.rate[gsm];
@@ -1174,8 +1174,6 @@ function update(){
             var matched = false;
             for(var i=0;i<t.length;i++){if(slots===t[i][0]){cost=t[i][sIdx];matched=true;break;}}
             if(!matched && slots > 4) cost = t[t.length-1][sIdx] + (slots-4)*(r[size]||0);
-            // School surcharge: +$10 per slot
-            if(type === 'walk-school' && cost > 0) cost += slots * 10;
             if(cost > 0){
                 cost = Math.round(cost*100)/100;
                 addonH += '<div class="sum-line"><span>'+label+' x'+slots+'</span><b>$'+cost.toFixed(2)+'</b></div>';
