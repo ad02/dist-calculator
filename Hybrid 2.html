@@ -711,9 +711,9 @@ select {
             <!-- Walkway tab -->
             <div class="tab-panel" id="panel-walk">
                 <div class="service-row"><div><div class="service-label">Walkway Standard</div><div class="service-hint">Qty = # of slots</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
-                <div class="service-row"><div><div class="service-label">Walkway (School)</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway (School)</div><div class="service-hint">$10 per school</div></div><input type="number" class="d-val" data-type="walk-school" placeholder="Enter how many schools" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Walkway (Remote Place)</div></div><input type="number" class="d-val" data-type="walk-remote" oninput="update()"></div>
-                <div class="service-row"><div><div class="service-label">Walkway Selected Date</div></div><input type="number" class="d-val" data-type="walk-exp" oninput="update()"></div>
+                <div class="service-row"><div><div class="service-label">Walkway Express and Selected Date</div></div><input type="number" class="d-val" data-type="walk-exp" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Walkway Express (Remote)</div></div><input type="number" class="d-val" data-type="walk-expr" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Walkway Sandwich Board</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
                 <div class="service-row"><div><div class="service-label">Walkway Backpack</div></div><input type="number" class="d-val" data-type="walk-std" oninput="update()"></div>
@@ -971,6 +971,9 @@ function getDistCost(type,gsm,size,qty){
 }
 
 function getWalkCost(type,gsm,size,slots){
+    if(slots<=0) return 0;
+    // School: flat $10 per school (no base walkway rate)
+    if(type === 'walk-school') return slots * 10;
     var sizeIdx={A5:1,A4:2,A3:3}[size]||1;
     var map=WALK_MAP[type];
     if(!map)return 0;
