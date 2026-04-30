@@ -522,35 +522,64 @@ select {
 
                 <div class="finishing-grid">
                     <button type="button" id="addonToggleBtn" onclick="toggleAddons()" style="background:none; border:1px dashed var(--border); color:var(--primary); font-weight:600; font-size:12px; padding:10px 16px; border-radius:8px; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:8px;">
-                        <span id="addonToggleIcon">+</span> Add-on Printing &amp; Finishing <span class="pill-warn" style="margin-left:4px;">TBD pricing</span>
+                        <span id="addonToggleIcon">+</span> Add-on Printing &amp; Finishing
                     </button>
                     <div id="addonBody" style="display:none; margin-top:14px;">
-                        <div class="finishing-row">
-                            <div style="grid-column: span 1;">
+                        <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px;">
+                            <!-- Add-on Printing -->
+                            <div style="padding:12px; background:var(--bg-soft); border:1px solid var(--border); border-radius:8px;">
+                                <label class="fld-label" style="margin-bottom:6px;">Add-on Printing</label>
                                 <select id="pAddon" onchange="update()">
-                                    <option value="0">Add-on Printing: No</option>
-                                    <option value="1">Add-on Printing: Yes</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes (uses Add-on rate table)</option>
                                 </select>
                                 <input type="number" id="pAddQty" placeholder="Add-on Qty" oninput="update()" style="display:none; margin-top:8px;">
                             </div>
-                            <select class="f-opt" data-name="Folding" onchange="update()">
-                                <option value="0">Folding: No</option><option value="1">Folding: Yes</option>
-                            </select>
-                            <select class="f-opt" data-name="Matte Paper" onchange="update()">
-                                <option value="0">Matte Paper: No</option><option value="1">Matte Paper: Yes</option>
-                            </select>
-                            <select class="f-opt" data-name="Crease+Fold" onchange="update()">
-                                <option value="0">Crease+Fold: No</option><option value="1">Crease+Fold: Yes</option>
-                            </select>
-                            <select class="f-opt" data-name="Perforation" onchange="update()">
-                                <option value="0">Perforation: No</option><option value="1">Perforation: Yes</option>
-                            </select>
-                            <select class="f-opt" data-name="Gloss Lami" onchange="update()">
-                                <option value="0">Gloss Lami: No</option><option value="1">Gloss Lami: Yes</option>
-                            </select>
-                            <select class="f-opt" data-name="Matte Lami" onchange="update()">
-                                <option value="0">Matte Lami: No</option><option value="1">Matte Lami: Yes</option>
-                            </select>
+                            <!-- Folding -->
+                            <div style="padding:12px; background:var(--bg-soft); border:1px solid var(--border); border-radius:8px;">
+                                <label class="fld-label" style="margin-bottom:6px;">Folding</label>
+                                <select id="pFolding" onchange="update()">
+                                    <option value="none">None</option>
+                                    <option value="standard">Standard ($30)</option>
+                                    <option value="crease">Crease + Folding ($50)</option>
+                                    <option value="special">Special ($50, 2+ folds or matte)</option>
+                                </select>
+                            </div>
+                            <!-- Matte Paper -->
+                            <div style="padding:12px; background:var(--bg-soft); border:1px solid var(--border); border-radius:8px;">
+                                <label class="fld-label" style="margin-bottom:6px;">Matte Paper</label>
+                                <select id="pMatte" onchange="update()">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes (+10% on printing)</option>
+                                </select>
+                            </div>
+                            <!-- Lamination -->
+                            <div style="padding:12px; background:var(--bg-soft); border:1px solid var(--border); border-radius:8px;">
+                                <label class="fld-label" style="margin-bottom:6px;">Matte / Glossy Lamination <span class="pill-warn" style="font-size:9px;">TBD</span></label>
+                                <input type="number" id="pLamiQty" placeholder="Qty" oninput="update()">
+                                <input type="number" id="pLamiRate" placeholder="$ rate per unit (TBD)" oninput="update()" style="margin-top:6px;">
+                            </div>
+                            <!-- Crease line -->
+                            <div style="padding:12px; background:var(--bg-soft); border:1px solid var(--border); border-radius:8px;">
+                                <label class="fld-label" style="margin-bottom:6px;">Crease Line (min $30)</label>
+                                <input type="number" id="pCreaseQty" placeholder="Qty" oninput="update()">
+                                <input type="number" id="pCreaseLines" placeholder="# of lines" oninput="update()" style="margin-top:6px;">
+                                <input type="number" id="pCreaseRate" placeholder="$ rate per line per 1K (TBD)" oninput="update()" style="margin-top:6px;">
+                            </div>
+                            <!-- Perforation line -->
+                            <div style="padding:12px; background:var(--bg-soft); border:1px solid var(--border); border-radius:8px;">
+                                <label class="fld-label" style="margin-bottom:6px;">Perforation Line <span class="pill-warn" style="font-size:9px;">TBD</span></label>
+                                <input type="number" id="pPerfQty" placeholder="Qty" oninput="update()">
+                                <input type="number" id="pPerfLines" placeholder="# of lines" oninput="update()" style="margin-top:6px;">
+                                <input type="number" id="pPerfRate" placeholder="$ rate per line per 1K (TBD)" oninput="update()" style="margin-top:6px;">
+                            </div>
+                            <!-- Punch hole -->
+                            <div style="padding:12px; background:var(--bg-soft); border:1px solid var(--border); border-radius:8px;">
+                                <label class="fld-label" style="margin-bottom:6px;">Punch Hole <span class="pill-warn" style="font-size:9px;">TBD</span></label>
+                                <input type="number" id="pPunchQty" placeholder="Qty" oninput="update()">
+                                <input type="number" id="pPunchHoles" placeholder="# of holes" oninput="update()" style="margin-top:6px;">
+                                <input type="number" id="pPunchRate" placeholder="$ rate per hole per 1K (TBD)" oninput="update()" style="margin-top:6px;">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -845,6 +874,28 @@ var HYBRID_PRINT={
 }
 };
 
+
+// ========= ADD-ON PRINTING DATA (separate cheaper rate table) =========
+var ADDON_PRINT={
+"A5":{
+"80":[[600,50.1,86.7],[1000,62.6,106.9],[2000,92.4,115.5],[4000,119.4,157.9],[6000,152.1,193.5],[8000,184.8,229.1],[10000,227.2,269.5],[12000,269.2,318.3],[14000,311.2,367.1],[16000,353.3,415.8],[18000,373.5,441.5],[20000,393.7,462],[24000,460.4,536.2],[28000,503.4,639.1],[32000,600,710],[36000,621.3,777.7],[40000,772,900],[48000,851.9,959],[56000,986.8,1131.1],[60000,1090.8,1287],[64000,1202.5,1398.7],[72000,1224.6,1445],[80000,1358.5,1526],[88000,1490.2,1602],[90000,1623.7,1662.3],[96000,1757.3,1798.7],[100000,1845,1935],[104000,1890.8,2054.1],[112000,2024.4,2071.3],[120000,2157.9,2207.7],[128000,2291.5,2344],[136000,2358.3,2412.2],[140000,2425,2480.4],[144000,2558.6,2616.7],[152000,2692.1,2753.1],[160000,2825.7,2889.4],[168000,2959.3,3025.8],[176000,3026,3093.9],[180000,3084.2,3162.1],[184000,3092.8,3230.3],[192000,3159.6,3545],[200000,3337.3,3835.1],[208000,3590.5,4093.9],[224000,3679.4,4125.3],[240000,3843.7,4415.4],[256000,4096.9,4705.6],[272000,4350.1,4995.7],[280000,4476.6,5140.8],[288000,4603.2,5285.8],[304000,4856.4,5576],[320000,5109.6,5866.1],[336000,5362.8,6156.3],[352000,5615.9,6446.4],[360000,5742.5,6591.5],[368000,5869.1,6736.5],[384000,6122.3,7026.7],[400000,6375.5,7316.8]],
+"128":[[600,68.4,103],[1000,82.8,120.4],[2000,110.7,133.8],[4000,142.5,189.7],[6000,195.9,233],[8000,249.3,276.3],[10000,285.9,329.2],[12000,339.5,387],[14000,393.1,444.7],[16000,446.6,502.5],[18000,470.1,531],[20000,494,561.5],[24000,585.2,669],[28000,697,797.3],[32000,778,880],[36000,880,1000],[40000,1014.3,1108.9],[48000,1082.8,1284],[56000,1258.9,1439],[60000,1436,1639.2],[64000,1512.4,1651.3],[72000,1613.1,1838.5],[80000,1790.1,2039.7],[88000,1997.7,2186.1],[90000,2042.5,2235],[96000,2149.3,2402.3],[100000,2356.4,2577.7],[104000,2419.5,2628.7],[112000,2535.8,2773.5],[120000,2715.2,2969.3],[128000,2894.6,3165.1],[136000,3074,3360.9],[140000,3163.7,3458.8],[144000,3253.3,3556.7],[152000,3432.7,3752.5],[160000,3612.1,3948.3],[168000,3791.5,4144.1],[176000,3970.9,4339.9],[180000,4060.5,4437.8],[184000,4150.2,4535.7],[192000,4329.6,4731.6],[200000,4564.9,5062.7],[208000,4826.7,5241.2],[224000,4912,5446.8],[240000,5259.1,5830.8],[256000,5606.1,6214.8],[272000,5953.2,6598.8],[280000,6126.7,6790.8],[288000,6300.2,6982.9],[304000,6647.3,7366.9],[320000,6994.4,7750.9],[336000,7341.4,8134.9],[352000,7688.5,8519],[360000,7862,8711],[368000,8035.6,8903],[384000,8382.6,9287],[400000,8729.7,9671]],
+"157":[[600,78,104.9],[1000,95.3,127.1],[2000,116.5,141.5],[4000,160.8,207.9],[6000,216.1,254.1],[8000,271.5,300.3],[10000,323.4,368.7],[12000,380,431],[14000,435.7,494],[16000,491.9,555.4],[18000,520.8,587.7],[20000,560,636],[24000,682.4,775.8],[28000,788.9,939],[32000,902.9,1070.7],[36000,1000,1149.7],[40000,1125,1275],[48000,1264.9,1427.9],[56000,1471.2,1661.4],[60000,1654.2,1826.4],[64000,1679.5,1832.4],[72000,1885.8,2049.8],[80000,2093,2273.1],[88000,2345.7,2534.1],[90000,2540.5,2761.4],[96000,2556.6,2793.4],[100000,2767.4,2988.6],[104000,2813.5,3022.7],[112000,2978.2,3215.8],[120000,3189,3443.1],[128000,3399.8,3670.3],[136000,3610.6,3897.5],[140000,3716,4011.2],[144000,3821.4,4124.8],[152000,4032.2,4352],[160000,4243,4579.2],[168000,4453.8,4806.5],[176000,4664.6,5033.7],[180000,4770,5147.3],[184000,4875.4,5260.9],[192000,5086.2,5488.2],[200000,5406.8,5904.6],[208000,5613.6,6028.1],[224000,5818.3,6353],[240000,6229.7,6801.4],[256000,6641.2,7249.9],[272000,7052.6,7698.3],[280000,7258.4,7922.5],[288000,7464.1,8146.7],[304000,7875.5,8595.1],[320000,8287,9043.5],[336000,8698.4,9491.9],[352000,9109.9,9940.3],[360000,9315.6,10164.6],[368000,9521.4,10388.8],[384000,9932.8,10837.2],[400000,10344.3,11285.6]],
+"260":[[600,120.6,159.7],[1000,130,173.3],[2000,190.6,221.7],[3000,217.6,273.4],[4000,263.8,322.5],[5000,313.8,369.6],[6000,380.2,431.2],[7000,440.9,481.3],[8000,501.5,526.5],[9000,562.1,589.1],[10000,622.8,651.7],[12000,712.8,752],[14000,831.6,877.3],[16000,950.4,1002.6],[18000,1069.2,1127.9],[20000,1188,1253.2],[24000,1434.3,1535.6],[28000,1649.6,1780.1],[32000,1865.8,2026.6],[36000,2082.9,2271.1],[40000,2298.2,2515.7]]
+},
+"A4":{
+"80":[[300,57.8,99.2],[500,63.6,104],[600,104,177.1],[1000,82.8,113.6],[2000,102.9,156],[3000,125.5,181.5],[4000,167.5,207],[5000,204.1,250.3],[6000,238.1,290.1],[7000,272.1,329.8],[8000,306.1,369.6],[9000,341.7,411],[10000,377.3,452.4],[12000,460.4,536.2],[14000,503.4,639.1],[16000,600,710],[18000,621.3,777.7],[20000,718,880],[24000,851.9,959],[28000,986.8,1131.1],[30000,1023.4,1209.5],[32000,1090.8,1287],[36000,1224.6,1445],[40000,1358.5,1526],[44000,1490.2,1602],[48000,1623.7,1662.3],[50000,1690.5,1730.5],[52000,1757.3,1798.7],[56000,1890.8,1935],[60000,2024.4,2071.3],[64000,2157.9,2207.7],[68000,2291.5,2344],[70000,2358.3,2412.2],[72000,2425,2480.4],[76000,2558.6,2616.7],[80000,2692.1,2753.1],[84000,2825.7,2889.4],[88000,2959.3,3025.8],[90000,3026,3093.9],[92000,3084.2,3162.1],[94000,3092.8,3230.3],[96000,3159.6,3434.8],[100000,3359.9,3545],[104000,3337.3,3835.1],[112000,3590.5,4125.3],[120000,3843.7,4415.4],[128000,4096.9,4705.6],[136000,4350.1,4995.7],[140000,4476.6,5140.8],[144000,4603.2,5285.8],[152000,4856.4,5576],[160000,5109.6,5866.1],[168000,5362.8,6156.3],[176000,5615.9,6446.4],[180000,5742.5,6591.5],[184000,5869.1,6736.5],[192000,6122.3,7026.7],[200000,6375.5,7316.8]],
+"128":[[300,79,112.7],[500,81.9,123.2],[600,114.6,196.4],[1000,109.8,133.8],[2000,138.6,177.1],[3000,183.9,219.9],[4000,229.1,262.8],[5000,279.2,311.9],[6000,323.4,373.2],[7000,367.7,434.5],[8000,412,495.7],[9000,451.4,539],[10000,490.9,595],[12000,585.2,669],[14000,697,797.3],[16000,778,880],[18000,880,1000],[20000,912.3,1077.4],[24000,1082.8,1284],[28000,1258.9,1439],[30000,1349.4,1538.6],[32000,1436,1639.2],[36000,1613.1,1838.5],[40000,1790.1,2039.7],[44000,1997.7,2186.1],[45000,2042.5,2235],[50000,2266.8,2479.8],[52000,2356.4,2577.7],[56000,2535.8,2773.5],[60000,2715.2,2969.3],[64000,2894.6,3165.1],[68000,3074,3360.9],[70000,3163.7,3458.8],[72000,3253.3,3556.7],[76000,3432.7,3752.5],[80000,3612.1,3948.3],[84000,3791.5,4144.1],[88000,3970.9,4339.9],[90000,4060.5,4437.8],[92000,4150.2,4535.7],[96000,4329.6,4731.6],[100000,4509,4927.4],[104000,4564.9,5062.7],[112000,4912,5446.8],[120000,5259.1,5830.8],[128000,5606.1,6214.8],[136000,5953.2,6598.8],[140000,6126.7,6790.8],[144000,6300.2,6982.9],[152000,6647.3,7366.9],[160000,6994.4,7750.9],[168000,7341.4,8134.9],[176000,7688.5,8519],[180000,7862,8711],[184000,8035.6,8903],[192000,8382.6,9287],[200000,8729.7,9671]],
+"157":[[300,92.4,115.5],[500,96.3,127.1],[600,124.2,205],[1000,120.4,140.6],[2000,152.1,189.7],[3000,203.1,239.2],[4000,254.1,288.8],[5000,302.3,339.8],[6000,355.8,402.7],[7000,409.4,466.2],[8000,463,529.4],[9000,517.4,591],[10000,571.8,652.6],[12000,682.4,775.8],[14000,788.9,939],[16000,902.9,1070.7],[18000,1000,1149.7],[20000,1056.6,1203.8],[24000,1264.9,1427.9],[28000,1471.2,1661.4],[30000,1575.8,1778.1],[32000,1679.5,1826.4],[36000,1885.8,2049.8],[40000,2093,2273.1],[44000,2345.7,2534.1],[45000,2556.6,2761.4],[50000,2662,2875],[52000,2767.4,2988.6],[56000,2978.2,3215.8],[60000,3189,3443.1],[64000,3399.8,3670.3],[68000,3610.6,3897.5],[70000,3716,4011.2],[72000,3821.4,4124.8],[76000,4032.2,4352],[80000,4243,4579.2],[84000,4453.8,4806.5],[88000,4664.6,5033.7],[90000,4770,5147.3],[92000,4875.4,5260.9],[96000,5086.2,5488.2],[100000,5297,5715.4],[104000,5406.8,5904.6],[112000,5818.3,6353],[120000,6229.7,6801.4],[128000,6641.2,7249.9],[136000,7052.6,7698.3],[140000,7258.4,7922.5],[144000,7464.1,8146.7],[152000,7875.5,8595.1],[160000,8287,9043.5],[168000,8698.4,9491.9],[176000,9109.9,9940.3],[180000,9315.6,10164.6],[184000,9521.4,10388.8],[192000,9932.8,10837.2],[200000,10344.3,11285.6]],
+"260":[[300,128,165.6],[600,199.3,295.5],[500,135.8,176.2],[1000,194.5,212.8],[2000,259.9,328.4],[3000,368.5,420.7],[4000,490.9,509.2],[5000,594,626.6],[6000,712.8,752],[7000,831.6,877.3],[8000,950.4,1002.6],[9000,1069.2,1127.9],[10000,1188,1253.2],[12000,1434.3,1535.6],[14000,1649.6,1780.1],[16000,1865.8,2026.6],[18000,2082.9,2271.1],[20000,2298.2,2515.7]]
+},
+"A3":{
+"80":[[300,104,177.1],[500,108.8,185.8],[1000,135.8,213.7],[2000,189.7,281.1],[3000,248.4,357.1],[4000,307.1,433.2],[5000,374.4,492.8],[6000,438.9,566],[7000,503.4,639.1],[8000,567.9,712.3],[9000,621.3,777.7],[10000,674.8,843.2],[12000,803.7,1008.3],[16000,1071.6,1324.3],[20000,1239.7,1477.2],[24000,1579,1831.9],[28000,1818.3,2094.3],[30000,1944.9,2239.4],[32000,2071.5,2384.5],[36000,2324.6,2674.6],[40000,2577.8,2964.7],[44000,2831,3254.9],[48000,3084.2,3545],[50000,3210.8,3690.1],[52000,3337.3,3835.1],[56000,3590.5,4125.3]],
+"128":[[300,114.6,196.4],[500,121.3,202.2],[1000,158.9,249.3],[2000,232,332.1],[3000,320,419.2],[4000,408.1,506.3],[5000,500,611.2],[6000,598,704.3],[7000,697,797.3],[8000,795,890.4],[9000,880,1000],[10000,941,1106],[12000,1124,1300],[16000,1431,1665],[20000,1704,1938.1],[24000,2149.3,2402.3],[28000,2482.5,2758.6],[30000,2656.1,2950.6],[32000,2829.6,3142.6],[36000,3176.7,3526.6],[40000,3523.7,3910.7],[44000,3870.8,4294.7],[48000,4217.9,4678.7],[50000,4391.4,4870.7],[52000,4564.9,5062.7],[56000,4912,5446.8]],
+"157":[[300,124.2,205],[500,131.9,209.9],[1000,177.1,262.8],[2000,273.4,372.5],[3000,372.5,462.5],[4000,471.7,552.5],[5000,582.4,675.7],[6000,685.7,807.4],[7000,788.9,939],[8000,892.3,1070.7],[9000,1000,1149.7],[10000,1105,1228.7],[12000,1320,1462.1],[16000,1750,1930],[20000,2050.8,2158.5],[24000,2540.5,2793.4],[28000,2938.1,3214.1],[30000,3143.8,3438.3],[32000,3349.5,3662.5],[36000,3761,4111],[40000,4172.4,4559.4],[44000,4583.9,5007.8],[48000,4995.4,5456.2],[50000,5201.1,5680.4],[52000,5406.8,5904.6],[56000,5818.3,6353]],
+"260":[[300,199.3,295.5],[500,223.3,327.3],[1000,309,403.3],[2000,482.3,563.1],[3000,703.6,753.7],[4000,925,1028.4],[5000,1199.5,1269.9],[6000,1434.3,1535.6],[7000,1649.6,1780.1],[8000,1865.8,2026.6],[9000,2082.9,2271.1],[10000,2298.2,2515.7]]
+}
+};
 // ========= DISTRIBUTION DATA =========
 var HDB_STD={
 "128":[[1000,149,155,175],[2000,177,189,229],[3000,194,212,272],[4000,212,236,316],[5000,240,270,370],[6000,288,324,444],[7000,301,343,483],[8000,344,392,552],[9000,360,418,594],[10000,380,440,640]],
@@ -933,6 +984,18 @@ var EXPRESS_MIN=150;
 var LANDMARK_RATE=40;
 
 function getDeliveryFee(c){if(c<=0)return 0;return Math.ceil(c/10)*10+20;}
+
+function getAddonPrintCost(size,gsm,side,qty){
+    var tiers = ADDON_PRINT[size] && ADDON_PRINT[size][gsm];
+    if(!tiers || qty <= 0) return {cost:0, exceeded:false};
+    var col = (side === 'ds') ? 2 : 1;
+    // Sort tiers by qty (some entries may be unordered)
+    var sorted = tiers.slice().sort(function(a,b){return a[0]-b[0];});
+    for(var i=0;i<sorted.length;i++){
+        if(qty <= sorted[i][0]) return {cost: sorted[i][col], exceeded:false};
+    }
+    return {cost: sorted[sorted.length-1][col], exceeded:true};
+}
 
 function getPrintCost(size,gsm,side,qty){
     var tiers=HYBRID_PRINT[size]&&HYBRID_PRINT[size][gsm];
@@ -1123,7 +1186,10 @@ function update(){
         }
     }
 
-    // Add-on print
+    // Track base printing cost for matte 10% calc (excludes add-ons & finishing)
+    var basePrintCost = pTotal;
+
+    // Add-on Printing (uses ADDON_PRINT table)
     var addonOn=document.getElementById('pAddon').value==='1';
     var addQtyInput=document.getElementById('pAddQty');
     addQtyInput.style.display=addonOn?'block':'none';
@@ -1131,22 +1197,96 @@ function update(){
     if(addonOn){
         var aq=parseInt(addQtyInput.value)||0;
         if(aq>0){
-            var ar=getPrintCost(size,gsm,side,aq);
+            var ar=getAddonPrintCost(size,gsm,side,aq);
             if(ar.cost>0){
                 pTotal+=ar.cost;
-                pH+='<div class="sum-line"><span>Add-on Print x'+aq.toLocaleString()+'</span><b>$'+ar.cost.toFixed(2)+'</b></div>';
+                var awarn = ar.exceeded ? ' <span style="color:#fbbf24">(max tier)</span>' : '';
+                pH+='<div class="sum-line"><span>Add-on Print x'+aq.toLocaleString()+awarn+'</span><b>$'+ar.cost.toFixed(2)+'</b></div>';
                 hasP=true;
             }
         }
     }
 
-    // Finishing (TBD)
-    document.querySelectorAll('.f-opt').forEach(function(o){
-        if(o.value==='1'){
-            pH+='<div class="sum-line"><span>'+o.dataset.name+'</span><b style="color:#fbbf24">TBD</b></div>';
-            hasP=true;
-        }
-    });
+    // Folding (3 types)
+    var folding = document.getElementById('pFolding').value;
+    if(folding === 'standard'){
+        pTotal += 30;
+        pH+='<div class="sum-line"><span>Standard Folding</span><b>$30.00</b></div>';
+        hasP=true;
+    } else if(folding === 'crease'){
+        pTotal += 50;
+        pH+='<div class="sum-line"><span>Crease + Folding</span><b>$50.00</b></div>';
+        hasP=true;
+    } else if(folding === 'special'){
+        pTotal += 50;
+        pH+='<div class="sum-line"><span>Folding (Special)</span><b>$50.00</b></div>';
+        hasP=true;
+    }
+
+    // Crease line (min $30, per line, by qty)
+    var creaseQty = parseInt(document.getElementById('pCreaseQty').value)||0;
+    var creaseLines = parseInt(document.getElementById('pCreaseLines').value)||0;
+    var creaseRate = parseFloat(document.getElementById('pCreaseRate').value)||0;
+    if(creaseQty > 0 && creaseLines > 0){
+        var cc = (creaseQty/1000) * creaseLines * creaseRate;
+        if(cc < 30) cc = 30;
+        cc = Math.round(cc*100)/100;
+        pTotal += cc;
+        pH+='<div class="sum-line"><span>Crease Line ('+creaseLines+' lines x '+creaseQty.toLocaleString()+')</span><b>$'+cc.toFixed(2)+'</b></div>';
+        hasP=true;
+    }
+
+    // Lamination
+    var lamiQty = parseInt(document.getElementById('pLamiQty').value)||0;
+    var lamiRate = parseFloat(document.getElementById('pLamiRate').value)||0;
+    if(lamiQty > 0 && lamiRate > 0){
+        var lc = Math.round(lamiQty * lamiRate * 100)/100;
+        pTotal += lc;
+        pH+='<div class="sum-line"><span>Lamination x'+lamiQty.toLocaleString()+'</span><b>$'+lc.toFixed(2)+'</b></div>';
+        hasP=true;
+    } else if(lamiQty > 0){
+        pH+='<div class="sum-line"><span>Lamination x'+lamiQty.toLocaleString()+'</span><b style="color:#fbbf24">TBD</b></div>';
+        hasP=true;
+    }
+
+    // Perforation (per line, rounded up per 1000 pcs)
+    var perfQty = parseInt(document.getElementById('pPerfQty').value)||0;
+    var perfLines = parseInt(document.getElementById('pPerfLines').value)||0;
+    var perfRate = parseFloat(document.getElementById('pPerfRate').value)||0;
+    if(perfQty > 0 && perfLines > 0 && perfRate > 0){
+        var pc = Math.ceil(perfQty/1000) * perfLines * perfRate;
+        pc = Math.round(pc*100)/100;
+        pTotal += pc;
+        pH+='<div class="sum-line"><span>Perforation ('+perfLines+' lines x '+perfQty.toLocaleString()+')</span><b>$'+pc.toFixed(2)+'</b></div>';
+        hasP=true;
+    } else if(perfQty > 0 && perfLines > 0){
+        pH+='<div class="sum-line"><span>Perforation ('+perfLines+' lines x '+perfQty.toLocaleString()+')</span><b style="color:#fbbf24">TBD</b></div>';
+        hasP=true;
+    }
+
+    // Punch Hole
+    var punchQty = parseInt(document.getElementById('pPunchQty').value)||0;
+    var punchHoles = parseInt(document.getElementById('pPunchHoles').value)||0;
+    var punchRate = parseFloat(document.getElementById('pPunchRate').value)||0;
+    if(punchQty > 0 && punchHoles > 0 && punchRate > 0){
+        var phc = Math.ceil(punchQty/1000) * punchHoles * punchRate;
+        phc = Math.round(phc*100)/100;
+        pTotal += phc;
+        pH+='<div class="sum-line"><span>Punch Hole ('+punchHoles+' holes x '+punchQty.toLocaleString()+')</span><b>$'+phc.toFixed(2)+'</b></div>';
+        hasP=true;
+    } else if(punchQty > 0 && punchHoles > 0){
+        pH+='<div class="sum-line"><span>Punch Hole ('+punchHoles+' holes x '+punchQty.toLocaleString()+')</span><b style="color:#fbbf24">TBD</b></div>';
+        hasP=true;
+    }
+
+    // Matte Paper (+10% on base printing only)
+    var matteOn = document.getElementById('pMatte').value === '1';
+    if(matteOn && basePrintCost > 0){
+        var mc = Math.round(basePrintCost * 0.10 * 100)/100;
+        pTotal += mc;
+        pH+='<div class="sum-line"><span>Matte Paper (+10%)</span><b>$'+mc.toFixed(2)+'</b></div>';
+        hasP=true;
+    }
 
     // Ah Wei
     var ahweiCost=getAhweiCost();
